@@ -18,7 +18,4 @@ The technical pre-requisites for AdvSearch are:
 - UTF-8 charset
 - php multi-bytes setting ON
 
-Optionals:
-- ZendSearch library 1.12 (Read installation chapter first) <https://github.com/zendframework/ZendSearch>
-
-AdvSearch uses JQuery 1.10.2 (included in the package).
+AdvSearch uses jQuery 1.10.2 (included in the package).

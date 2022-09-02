@@ -180,24 +180,9 @@ class AdvSearchResults extends AdvSearch {
         $lstContexts = $this->modx->getOption('contexts', $this->config, $this->modx->context->get('key'));
         $this->config['contexts'] = implode(',', array_map('trim', explode(',', $lstContexts)));
 
-        /**
-         * @deprecated
-         */
-        // &docindexPath [ path | 'assets/files/docindex/' ]
-        $path = $this->modx->getOption('docindexPath', $this->config, 'docindex/');
-        $this->config['docindexPath'] = $this->modx->getOption('assets_path') . 'files/' . $path;
-
-        /**
-         * &docindexRoot [ path | '[[++core_path]]docindex/' ]
-         * eg: will be appended by engine's name
-         *     [[++core_path]]docindex/zend/ for zend engine
-         */
-        $this->config['docindexRoot'] = $this->modx->getOption('docindexRoot', $this->config, '[[++core_path]]docindex/');
-
-        // &engine [ 'mysql' | 'zend' | 'all' | ... ] - name of search engine to use
+        // &engine [ 'mysql' | 'all' | ... ] - name of search engine to use
         $engine = strtolower(trim($this->modx->getOption('engine', $this->config, 'mysql')));
         $this->config['engine'] = !empty($engine) ? $engine : 'mysql';
-        $this->config['engineConfigFile'] = $this->modx->getOption('engineConfigFile', $this->config);
         $this->config['engineControllerPath'] = $this->modx->getOption('engineControllerPath', $this->config);
 
         // &fields [csv list of fields | 'pagetitle,longtitle,alias,description,introtext,content' (modResource)  '' otherwise ]

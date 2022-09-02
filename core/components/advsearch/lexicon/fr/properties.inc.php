@@ -52,7 +52,6 @@ $_lang['advsearch.advsearch_containerTpl_desc'] = 'Le chunk qui sera utilisé po
 $_lang['advsearch.advsearch_contexts_desc'] = 'La liste des contextes dans lesquels doit se faire la recherche.';
 $_lang['advsearch.advsearch_currentPageTpl_desc'] = 'Le chunk a utiliser pour le lien de pagination: page courante.';
 $_lang['advsearch.advsearch_debug_desc'] = 'Niveau de debug.';
-$_lang['advsearch.advsearch_docindexPath_desc'] = 'Le chemin sous assets/files/ ou se situe l\'index lucene.';
 $_lang['advsearch.advsearch_effect_desc'] = 'Nom de l\'effet à utiliser pour afficher la fenêtre de resultats (mode ajax).';
 $_lang['advsearch.advsearch_engine_desc'] = 'Moteur de recherche sélectionné.';
 $_lang['advsearch.advsearch_extractEllipsis_desc'] = 'Chaine de caractères utilisée pour marquer le début et la fin d\'un extrait lorsque le texte est coupé.';

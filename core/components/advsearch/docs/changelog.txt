@@ -3,6 +3,7 @@ Changelog for AdvSearch
 AdvSearch 3.0.0-alpha
 -------------------
 - support for Solr removed
+- support for Zend removed
 
 AdvSearch 2.0.0-beta1
 -------------------

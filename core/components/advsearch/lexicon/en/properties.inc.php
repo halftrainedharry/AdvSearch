@@ -52,7 +52,6 @@ $_lang['advsearch.advsearch_containerTpl_desc'] = 'The chunk that will be used t
 $_lang['advsearch.advsearch_contexts_desc'] = 'The contexts to search. Comma separated context names.';
 $_lang['advsearch.advsearch_currentPageTpl_desc'] = 'The chunk to use for the current pagination link.';
 $_lang['advsearch.advsearch_debug_desc'] = 'Debug level.';
-$_lang['advsearch.advsearch_docindexPath_desc'] = 'The path under assets/files/ where are located Lucene document indexes.';
 $_lang['advsearch.advsearch_effect_desc'] = 'Effect name to use to display the window of results (mode ajax).';
 $_lang['advsearch.advsearch_engine_desc'] = 'Search engine selected.';
 $_lang['advsearch.advsearch_extractEllipsis_desc'] = 'String used to mark the beginning and the end of an extract when the sentence is cutting.';

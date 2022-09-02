@@ -63,11 +63,6 @@ switch ($options[xPDOTransport::PACKAGE_ACTION]) {
             $modx->log(xPDO::LOG_LEVEL_ERROR, 'This package runs only with the multibyte extension on. See Lexicon and language system settings.');
             $success = false;
         }
-        // check the existence of the Zend search library
-//        $modx->log(xPDO::LOG_LEVEL_INFO, ' >>> Checking for the presence of the Zend Search library ');
-//        if (!is_dir(MODX_CORE_PATH . 'components/advsearch/library/ZendSearch')) {
-//            $modx->log(xPDO::LOG_LEVEL_INFO, 'Zend search library not found in ' . MODX_CORE_PATH . 'components/advsearch/library/ZendSearch - May be you have installed this library somewhere else. Install will continue');
-//        }
 
         if ($success) {
             $modx->log(xPDO::LOG_LEVEL_INFO, 'End of validation. Install package successfull');

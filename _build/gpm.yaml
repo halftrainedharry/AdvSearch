@@ -79,11 +79,6 @@ snippets:
         type: textfield
         value: pagetitle,longtitle,alias,description,introtext,content
         lexicon: advsearch:properties
-      - name: docindexPath
-        description: advsearch.advsearch_docindexPath_desc
-        type: textfield
-        value: docindex/
-        lexicon: advsearch:properties
       - name: effect
         description: advsearch.advsearch_effect_desc
         type: list
@@ -102,8 +97,6 @@ snippets:
         options:
           - text: mysql
             value: mysql
-          - text: zend
-            value: zend
           - text: all
             value: all
         value: mysql

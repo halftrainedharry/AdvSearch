@@ -18,7 +18,7 @@
  *
  * @package advsearch
  */
- 
+
 /**
  * Properties (property descriptions) Lexicon Topic
  *
@@ -55,7 +55,6 @@ $_lang['advsearch.advsearch_containerTpl_desc']          = 'Chunk, welcher als W
 $_lang['advsearch.advsearch_contexts_desc']              = 'Kommaseparierte Liste von Context-Namen in denen gesucht werden soll.';
 $_lang['advsearch.advsearch_currentPageTpl_desc']        = 'Chunk, welcher f&uuml;r die Anzeige des aktuellen Seitennummern-Links verwendet wird.';
 $_lang['advsearch.advsearch_debug_desc']                 = 'Debug Level.';
-$_lang['advsearch.advsearch_docindexPath_desc']          = 'Pfad innerhalb von assets/files/ zur Ablage der Lucene Dokument-Indizes.';
 $_lang['advsearch.advsearch_effect_desc']                = 'Name des Effekts f&uuml;r die Darstellung des Ergebnisfensters (Ajax Modus).';
 $_lang['advsearch.advsearch_engine_desc']                = 'Verwendete Such-Engine.';
 $_lang['advsearch.advsearch_extractEllipsis_desc']       = 'String der am Beginn und Ende von Textausz&uuml;gen verwendet wird.';
