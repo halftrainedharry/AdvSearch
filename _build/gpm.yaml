@@ -47,7 +47,6 @@ chunks:
 snippets:
   - name: AdvSearch
     description: AdvSearch snippet to get the output.
-    file: advsearch.snippet.php
     properties:
       - name: asId
         description: advsearch.advsearch_asId_desc
@@ -95,10 +94,10 @@ snippets:
         description: advsearch.advsearch_engine_desc
         type: list
         options:
-          - text: mysql
-            value: mysql
-          - text: all
-            value: all
+          - text: MySql
+            value: MySql
+          - text: All
+            value: All
         value: mysql
         lexicon: advsearch:properties
       - name: extractEllipsis
@@ -323,7 +322,6 @@ snippets:
         lexicon: advsearch:properties
   - name: AdvSearchForm
     description: AdvSearchForm snippet to render search form.
-    file: advsearchform.snippet.php
     properties:
       - name: addCss
         description: advsearch.advsearchform_addCss_desc
@@ -447,7 +445,6 @@ snippets:
         lexicon: advsearch:properties
   - name: AdvSearchGmapInfoWindow
     description: AdvSearch snippet for AdvSearch's googlemap infobox.
-    file: advsearch.gmapinfowindow.snippet.php
 plugins:
     - name: AdvSearch
       description: AdvSearch to clear cache on its partition.

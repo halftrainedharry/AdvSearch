@@ -1,4 +1,6 @@
 <?php
+use MODX\Revolution\modX;
+use MODX\Revolution\modResource;
 
 $gets = $modx->sanitize($_GET);
 $withTVs = $modx->getOption('withTVs', $scriptProperties);
@@ -8,7 +10,7 @@ if (!isset($gets['urlID']) || empty($gets['urlID']) || empty($tpl)) {
 }
 $output = '';
 
-$c = $modx->newQuery('modResource');
+$c = $modx->newQuery(modResource::class);
 $c->select(array(
     'modResource.*',
 ));
@@ -32,7 +34,7 @@ $c->where(array(
     'modResource.id' => $gets['urlID']
 ));
 
-$resource = $modx->getObject('modResource', $c);
+$resource = $modx->getObject(modResource::class, $c);
 if (!$resource) {
     $output = 'No info';
     $c->prepare();

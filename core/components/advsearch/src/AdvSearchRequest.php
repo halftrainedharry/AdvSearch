@@ -1,5 +1,11 @@
 <?php
+namespace AdvSearch;
 
+use xPDO\xPDO;
+use MODX\Revolution\modX;
+use AdvSearch\AdvSearch;
+use AdvSearch\AdvSearchHooks;
+use AdvSearch\AdvSearchResults;
 /**
  * AdvSearch - AdvSearch class
  *
@@ -11,7 +17,6 @@
  * @tutorial	Main class to get & display search results
  *
  */
-include_once dirname(__FILE__) . "/advsearch.class.php";
 
 class AdvSearchRequest extends AdvSearch {
 
@@ -146,11 +151,7 @@ class AdvSearchRequest extends AdvSearch {
         if ($doQuery) {
             $defaultAdvSearchCorePath = $this->modx->getOption('core_path') . 'components/advsearch/';
             $advSearchCorePath = $this->modx->getOption('advsearch.core_path', null, $defaultAdvSearchCorePath);
-            $this->searchResults = $this->modx->getService('advsearchresults', 'AdvSearchResults', $advSearchCorePath . 'model/advsearch/', $this->config);
-            if (!($this->searchResults instanceof AdvSearchResults)) {
-                $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] Could not load AdvSearchResults class.');
-                return false;
-            }
+            $this->searchResults = new AdvSearchResults($this->modx, $this->config);
             $this->searchResults->doSearch($asContext);
             $outputCount = $this->searchResults->resultsCount;
             // searchResults resets "page" to 1 if the offset beyond the limit
@@ -269,8 +270,7 @@ class AdvSearchRequest extends AdvSearch {
             return false;
         }
 
-        include_once dirname(__FILE__) . "/advsearchhooks.class.php";
-        if (!class_exists('AdvSearchHooks')) {
+        if (!class_exists(AdvSearchHooks::class)) {
             $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] Could not load AdvSearchHooks class.');
             return false;
         }

@@ -1,4 +1,9 @@
 <?php
+namespace AdvSearch;
+
+use MODX\Revolution\modX;
+use MODX\Revolution\modChunk;
+use xPDO\Om\xPDOQuery;
 
 /**
  * AdvSearch - AdvSearch's main class
@@ -14,8 +19,8 @@
 
 class AdvSearch {
 
-    const VERSION = '2.0.0';
-    const RELEASE = 'beta1';
+    const VERSION = '3.0.0';
+    const RELEASE = 'alpha';
 
     public $modx;
     public $config = array();
@@ -70,7 +75,7 @@ class AdvSearch {
         if (strtolower(trim($config['charset'])) !== 'utf-8') {
             $msg = '[AdvSearch] AdvSearch runs only with charset UTF-8. The current charset is ' . $config['charset'];
             $this->modx->log(modX::LOG_LEVEL_ERROR, $msg);
-            throw new Exception($msg);
+            throw new \Exception($msg);
         }
 
         // check that multibyte string option is on
@@ -78,7 +83,7 @@ class AdvSearch {
         if (!$usemb) {
             $msg = '[AdvSearch] AdvSearch runs only with the multibyte extension on. See Lexicon and language system settings.';
             $this->modx->log(modX::LOG_LEVEL_ERROR, $msg);
-            throw new Exception($msg);
+            throw new \Exception($msg);
         }
 
         //===============================================================================================================================
@@ -353,7 +358,7 @@ class AdvSearch {
             $tplFile = $this->replacePropPhs($tplFile);
             try {
                 $output = $this->parseTplFile($tplFile, $phs);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 return $e->getMessage();
             }
         }
@@ -364,13 +369,13 @@ class AdvSearch {
             $tplChunk = ltrim($tpl, ':');
             $tplChunk = trim($tpl);
 
-            $chunk = $this->modx->getObject('modChunk', array('name' => $tplChunk), true);
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $tplChunk), true);
             if (empty($chunk)) {
                 // try to use @splittingred's fallback
                 $f = $this->config['chunksPath'] . strtolower($tplChunk) . '.chunk.tpl';
                 try {
                     $output = $this->parseTplFile($f, $phs);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $output = $e->getMessage();
                     $this->modx->log(modX::LOG_LEVEL_DEBUG, 'Chunk: ' . $tplChunk . ' is not found, neither the file ' . $output);
                     return;
@@ -380,7 +385,7 @@ class AdvSearch {
                 /**
                  * @link    http://forums.modx.com/thread/74071/help-with-getchunk-and-modx-speed-please?page=4#dis-post-464137
                  */
-                $chunk = $this->modx->getParser()->getElement('modChunk', $tplChunk);
+                $chunk = $this->modx->getParser()->getElement(modChunk::class, $tplChunk);
                 $this->_chunks[$tpl] = $chunk->get('content');
                 $chunk->setCacheable(false);
                 $chunk->_processed = false;
@@ -398,7 +403,7 @@ class AdvSearch {
      * @return  string  parsed output
      */
     public function parseTplCode($code, array $phs = array()) {
-        $chunk = $this->modx->newObject('modChunk');
+        $chunk = $this->modx->newObject(modChunk::class);
         $chunk->setContent($code);
         $chunk->setCacheable(false);
         $phs = $this->replacePropPhs($phs);
@@ -415,11 +420,11 @@ class AdvSearch {
      */
     public function parseTplFile($file, array $phs = array()) {
         if (!file_exists($file)) {
-            throw new Exception('File: ' . $file . ' is not found.');
+            throw new \Exception('File: ' . $file . ' is not found.');
         }
         $o = file_get_contents($file);
         $this->_chunks[$file] = $o;
-        $chunk = $this->modx->newObject('modChunk');
+        $chunk = $this->modx->newObject(modChunk::class);
 
         // just to create a name for the modChunk object.
         $name = strtolower(basename($file));
@@ -503,9 +508,9 @@ class AdvSearch {
      * @return string $mysqlVersion mysql server version as "5.5.8-log"
      */
     public function getMysqlVersion() {
-        $c = new xPDOCriteria($this->modx, "SELECT VERSION() AS mysql_version;");
+        $c = new \xPDO\Om\xPDOCriteria($this->modx, "SELECT VERSION() AS mysql_version;");
         $c->stmt->execute();
-        $result = $c->stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $c->stmt->fetchAll(\PDO::FETCH_ASSOC);
         $c->stmt->closeCursor();
         $mysqlVersion = $result[0]['mysql_version'];
         return $mysqlVersion;
@@ -640,7 +645,7 @@ class AdvSearch {
                 if ($stmt->execute()) {
                     $this->modx->queryTime += microtime(true) - $tstart;
                     $this->modx->executedQueries++;
-                    if ($results= $stmt->fetchAll(PDO::FETCH_COLUMN)) {
+                    if ($results= $stmt->fetchAll(\PDO::FETCH_COLUMN)) {
                         $count= reset($results);
                         $count= intval($count);
                     }

@@ -1,5 +1,4 @@
 <?php
-
 switch ($modx->event->name) {
     case 'OnDocFormSave':
     case 'OnTemplateSave':
@@ -11,9 +10,9 @@ switch ($modx->event->name) {
     case 'OnChunkFormSave':
     case 'OnSiteRefresh':
         $cacheManager = $modx->getCacheManager();
-        $cacheManager->refresh(array(
-            'advsearch' => array(),
-        ));
+        $cacheManager->refresh([
+            'advsearch' => [],
+        ]);
         break;
 }
 

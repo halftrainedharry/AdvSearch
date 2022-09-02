@@ -1,5 +1,9 @@
 <?php
+namespace AdvSearch;
 
+use MODX\Revolution\modX;
+use MODX\Revolution\modResource;
+use AdvSearch\AdvSearch;
 /**
  * AdvSearch - AdvSearchForm class
  *
@@ -11,7 +15,6 @@
  * @tutorial	Main class to display the search form
  *
  */
-include_once dirname(__FILE__) . "/advsearch.class.php";
 
 class AdvSearchForm extends AdvSearch {
 
@@ -24,7 +27,7 @@ class AdvSearchForm extends AdvSearch {
             if (!$config['ajaxResultsId']) {
                 $msg = '[AdvSearch] &ajaxResultsId property is required and can not be zero!';
                 $modx->log(modX::LOG_LEVEL_ERROR, $msg);
-                throw new Exception($msg);
+                throw new \Exception($msg);
             }
         }
 
@@ -63,15 +66,15 @@ class AdvSearchForm extends AdvSearch {
             $helpHandler = $this->config['help'];
             if ($helpHandler != 1) {
                 // specific help handler provided
-                $resource = $this->modx->getObject('modResource', array(
+                $resource = $this->modx->getObject(modResource::class, [
                     'id' => $helpHandler,
                     'published' => 1
-                ));
+                ]);
             } else {
-                $resource = $this->modx->getObject('modResource', array(
+                $resource = $this->modx->getObject(modResource::class, [
                     'published' => 1,
                     'pagetitle' => 'AdvSearch help'
-                ));
+                ]);
             }
             if ($resource) {   // advSearchHelp handler exists
                 $helpHandler = $resource->get('id');

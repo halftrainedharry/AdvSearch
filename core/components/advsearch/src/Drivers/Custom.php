@@ -1,14 +1,14 @@
 <?php
+namespace AdvSearch\Drivers;
 
-if (!class_exists('AdvSearchEngineController')) {
-    include_once dirname(__FILE__) . '/advsearch.engine.controller.class.php';
-}
+use MODX\Revolution\modX;
+use AdvSearch\Drivers\Base;
 
-class AdvSearchCustomController extends AdvSearchEngineController {
+class Custom extends Base {
 
     public function getResults($asContext) {
         if (empty($asContext['queryHook'])) {
-            $msg = 'Missing query hook for engine: "custom"';
+            $msg = 'Missing query hook for engine: "Custom"';
             $this->setError($msg);
             $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] ' . $msg, '', __METHOD__, __FILE__, __LINE__);
             return false;
@@ -104,5 +104,3 @@ class AdvSearchCustomController extends AdvSearchEngineController {
     }
 
 }
-
-return 'AdvSearchCustomController';

@@ -1,8 +1,13 @@
 <?php
+namespace AdvSearch\Drivers;
 
-include_once dirname(__FILE__) . '/advsearch.engine.controller.class.php';
+use MODX\Revolution\modX;
+use MODX\Revolution\modResource;
+use MODX\Revolution\modTemplateVar;
+use xPDO\Om\xPDOQuery;
+use AdvSearch\Drivers\Base;
 
-class AdvSearchMysqlController extends AdvSearchEngineController {
+class MySql extends Base {
 
     public function getResults($asContext) {
         $results = $this->_getResults($asContext);
@@ -205,7 +210,7 @@ class AdvSearchMysqlController extends AdvSearchEngineController {
                 $this->ifDebug('Final select after pagination: ' . $this->niceQuery($c), __METHOD__, __FILE__, __LINE__);
 
                 //============================= get results
-                $collection = $this->modx->getCollection('modResource', $c);
+                $collection = $this->modx->getCollection(modResource::class, $c);
 
                 //============================= append & render tv fields (includeTVs, withTVs)
                 $this->results = $this->_appendTVsFields($collection, $asContext);
@@ -262,17 +267,17 @@ class AdvSearchMysqlController extends AdvSearchEngineController {
             $exec = $c->stmt->execute();
             if ($exec) {
                 if (count($allowedTvNames)) {
-                    while ($row = $c->stmt->fetch(PDO::FETCH_ASSOC)) {
+                    while ($row = $c->stmt->fetch(\PDO::FETCH_ASSOC)) {
                         // Append & render tv fields (includeTVs, withTVs)
                         $tvs = array();
-                        $templateVars = $this->modx->getCollection('modTemplateVar', array('name:IN' => $allowedTvNames));
+                        $templateVars = $this->modx->getCollection(modTemplateVar::class, array('name:IN' => $allowedTvNames));
                         foreach ($templateVars as $tv) {
                             $tvs[$tv->get('name')] = $tv->renderOutput($row['id']);
                         }
                         $results[] = array_merge($row, $tvs);
                     }
                 } else {
-                    $results = $c->stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $results = $c->stmt->fetchAll(\PDO::FETCH_ASSOC);
                 }
                 $c->stmt->closeCursor();
             }
@@ -324,7 +329,7 @@ class AdvSearchMysqlController extends AdvSearchEngineController {
             foreach ($collection as $resourceId => $resource) {
                 $result = $resource->get($displayedFields);
                 $tvs = array();
-                $templateVars = $this->modx->getCollection('modTemplateVar', array('name:IN' => $allowedTvNames));
+                $templateVars = $this->modx->getCollection(modTemplateVar::class, array('name:IN' => $allowedTvNames));
                 foreach ($templateVars as $tv) {
                     $tvs[$tv->get('name')] = $tv->renderOutput($result['id']);
                 }
@@ -340,5 +345,3 @@ class AdvSearchMysqlController extends AdvSearchEngineController {
     }
 
 }
-
-return 'AdvSearchMysqlController';

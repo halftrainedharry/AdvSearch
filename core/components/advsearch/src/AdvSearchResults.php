@@ -1,5 +1,10 @@
 <?php
+namespace AdvSearch;
 
+use MODX\Revolution\modX;
+use MODX\Revolution\modResource;
+use MODX\Revolution\modChunk;
+use AdvSearch\AdvSearch;
 /**
  * AdvSearch - AdvSearchResults class
  *
@@ -11,11 +16,10 @@
  * @tutorial	Class to get search results
  *
  */
-include_once dirname(__FILE__) . "/advsearch.class.php";
 
 class AdvSearchResults extends AdvSearch {
 
-    public $mainClass = 'modResource';
+    public $mainClass = modResource::class;
     public $primaryKey = 'id';
     public $mainFields = array();
     public $joinedFields = array();
@@ -31,7 +35,7 @@ class AdvSearchResults extends AdvSearch {
     protected $mainWhereFields = array();
     protected $joinedWhereFields = array();
     protected $tvWhereFields = array();
-    protected $controller;
+    protected $driver;
 
     public function __construct(modX & $modx, array & $config = array()) {
         parent::__construct($modx, $config);
@@ -57,7 +61,7 @@ class AdvSearchResults extends AdvSearch {
         $asContext['joinedWhereFields'] = $this->joinedWhereFields;
         $asContext['sortby'] = $this->sortby;
 
-        $engine = trim(strtolower($this->config['engine']));
+        $engine = trim($this->config['engine']);
         if (empty($engine)) {
             $msg = 'Engine was not defined';
             $this->setError($msg);
@@ -66,13 +70,13 @@ class AdvSearchResults extends AdvSearch {
         }
 
         // get results
-        if (!$this->controller) {
-            if ($this->mainClass === 'modResource') {
+        if (!$this->driver) {
+            if ($this->mainClass === modResource::class) {
                 // default package (modResource + Tvs) and possibly joined packages
                 try {
-                    $this->controller = $this->loadController($engine);
-                } catch (Exception $ex) {
-                    $msg = 'Could not load controller for engine: "' . $engine . '". Exception: ' . $ex->getMessage();
+                    $this->driver = $this->loadDriver($engine);
+                } catch (\Exception $ex) {
+                    $msg = 'Could not load driver for engine: "' . $engine . '". Exception: ' . $ex->getMessage();
                     $this->setError($msg);
                     $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] ' . $msg, '', __METHOD__, __FILE__, __LINE__);
                     return false;
@@ -80,21 +84,21 @@ class AdvSearchResults extends AdvSearch {
             } else {
                 // search in a different main package and possibly joined packages
                 try {
-                    $this->controller = $this->loadController('custom');
-                } catch (Exception $ex) {
-                    $msg = 'Could not load controller for engine: "' . $engine . '" Exception: ' . $ex->getMessage();
+                    $this->driver = $this->loadDriver('Custom');
+                } catch (\Exception $ex) {
+                    $msg = 'Could not load driver for engine: "' . $engine . '" Exception: ' . $ex->getMessage();
                     $this->setError($msg);
                     $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] ' . $msg, '', __METHOD__, __FILE__, __LINE__);
                     return false;
                 }
             }
         }
-        if ($this->controller) {
-            $this->results = $this->controller->getResults($asContext);
-            $this->resultsCount = $this->controller->getResultsCount();
-            $this->page = $this->controller->getPage();
+        if ($this->driver) {
+            $this->results = $this->driver->getResults($asContext);
+            $this->resultsCount = $this->driver->getResultsCount();
+            $this->page = $this->driver->getPage();
         } else {
-            $msg = 'Controller could not generate the result';
+            $msg = 'Driver could not generate the result';
             $this->setError($msg);
             $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] ' . $msg, '', __METHOD__, __FILE__, __LINE__);
             return false;
@@ -115,7 +119,7 @@ class AdvSearchResults extends AdvSearch {
                 $this->htmlResult = $this->renderOutput($this->results);
             }
             if (in_array('ids', $outputType)) {
-                $this->idResults = $this->controller->idResults;
+                $this->idResults = $this->driver->idResults;
             }
         }
 
@@ -126,21 +130,21 @@ class AdvSearchResults extends AdvSearch {
         return $this->page;
     }
 
-    public function loadController($name) {
-        if (!empty($this->config['engineControllerPath'])) {
-            $filename = $this->replacePropPhs($this->config['engineControllerPath']);
+    public function loadDriver($name) {
+        if (!empty($this->config['driverClass'])) {
+            $driverClass = $this->config['driverClass'];
         } else {
-            $filename = dirname(dirname(dirname(__FILE__))) . '/controllers/advsearch.' . strtolower($name) . '.controller.class.php';
+            $driverClass = 'AdvSearch\\Drivers\\' . $name;
         }
-        if (!file_exists($filename)) {
-            $msg = 'Missing Controller file: ' . $filename;
-            $this->setError($msg);
-            throw new Exception($msg);
-        }
-        $className = include $filename;
-        $controller = new $className($this->modx, $this->config);
 
-        return $controller;
+        if (!class_exists($driverClass)) {
+            $msg = 'Missing Driver class: ' . $driverClass;
+            $this->setError($msg);
+            throw new \Exception($msg);
+        }
+
+        $driver = new $driverClass($this->modx, $this->config);
+        return $driver;
     }
 
     /**
@@ -180,10 +184,10 @@ class AdvSearchResults extends AdvSearch {
         $lstContexts = $this->modx->getOption('contexts', $this->config, $this->modx->context->get('key'));
         $this->config['contexts'] = implode(',', array_map('trim', explode(',', $lstContexts)));
 
-        // &engine [ 'mysql' | 'all' | ... ] - name of search engine to use
-        $engine = strtolower(trim($this->modx->getOption('engine', $this->config, 'mysql')));
-        $this->config['engine'] = !empty($engine) ? $engine : 'mysql';
-        $this->config['engineControllerPath'] = $this->modx->getOption('engineControllerPath', $this->config);
+        // &engine [ 'MySql' | 'All' | ... ] - name of search engine to use
+        $engine = trim($this->modx->getOption('engine', $this->config, 'MySql'));
+        $this->config['engine'] = !empty($engine) ? $engine : 'MySql';
+        $this->config['driverClass'] = $this->modx->getOption('driverClass', $this->config);
 
         // &fields [csv list of fields | 'pagetitle,longtitle,alias,description,introtext,content' (modResource)  '' otherwise ]
         $lstFields = $this->config['fields'];
@@ -197,7 +201,7 @@ class AdvSearchResults extends AdvSearch {
         $this->config['fields'] = implode(',', $fields);
 
         // initialise mainFields : 'id', 'template', 'context_key', 'createdon' + docFields for modResource
-        if ($this->mainClass == 'modResource') {
+        if ($this->mainClass == modResource::class) {
             $requiredFields = array('id', 'template', 'context_key', 'createdon');
         } else {
             $requiredFields = array($this->primaryKey);
@@ -232,7 +236,7 @@ class AdvSearchResults extends AdvSearch {
             $this->config['withFields'] = $lstWithFields;
         }
 
-        if ($this->mainClass == 'modResource') {
+        if ($this->mainClass == modResource::class) {
             // &hideMenu [ 0 | 1 | 2 ]  Search in hidden documents from menu.
             $hideMenu = (int) $this->modx->getOption('hideMenu', $this->config, 2);
             $this->config['hideMenu'] = (($hideMenu < 3) && ($hideMenu >= 0)) ? $hideMenu : 2;
@@ -404,12 +408,12 @@ class AdvSearchResults extends AdvSearch {
 
         // &containerTpl [ chunk name | 'AdvSearchResults' ]
         $containerTpl = $this->modx->getOption('containerTpl', $this->config, 'AdvSearchResults');
-        $chunk = $this->modx->getObject('modChunk', array('name' => $containerTpl));
+        $chunk = $this->modx->getObject(modChunk::class, array('name' => $containerTpl));
         $this->config['containerTpl'] = (empty($chunk)) ? 'searchresults' : $containerTpl;
 
         // &tpl [ chunk name | 'AdvSearchResult' ]
         $tpl = $this->modx->getOption('tpl', $this->config, 'AdvSearchResult');
-        $chunk = $this->modx->getObject('modChunk', array('name' => $tpl));
+        $chunk = $this->modx->getObject(modChunk::class, array('name' => $tpl));
         $this->config['tpl'] = (empty($chunk)) ? 'searchresult' : $tpl;
 
         // &showExtract [ string | '1:content' ]
@@ -446,7 +450,7 @@ class AdvSearchResults extends AdvSearch {
 
             // &extractTpl [ chunk name | 'Extract' ]
             $extractTpl = $this->modx->getOption('extractTpl', $this->config, 'Extract');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $extractTpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $extractTpl));
             $this->config['extractTpl'] = (empty($chunk)) ? 'extract' : $extractTpl;
 
             // &highlightResults [ 0 | 1 ]
@@ -469,22 +473,22 @@ class AdvSearchResults extends AdvSearch {
         if ($this->config['pagingType'] == 1) {
             // &paging1Tpl [ chunk name | 'Paging1' ]
             $paging1Tpl = $this->modx->getOption('paging1Tpl', $this->config, 'Paging1');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $paging1Tpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging1Tpl));
             $this->config['paging1Tpl'] = (empty($chunk)) ? 'paging1' : $paging1Tpl;
         } elseif ($this->config['pagingType'] == 2) {
             // &paging2Tpl [ chunk name | 'Paging2' ]
             $paging2Tpl = $this->modx->getOption('paging2Tpl', $this->config, 'Paging2');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $paging2Tpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging2Tpl));
             $this->config['paging2Tpl'] = (empty($chunk)) ? 'paging2' : $paging2Tpl;
 
             // &currentPageTpl [ chunk name | 'CurrentPageLink' ]
             $currentPageTpl = $this->modx->getOption('currentPageTpl', $this->config, 'CurrentPageLink');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $currentPageTpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $currentPageTpl));
             $this->config['currentPageTpl'] = (empty($chunk)) ? 'currentpagelink' : $currentPageTpl;
 
             // &pageTpl [ chunk name | 'PageLink' ]
             $pageTpl = $this->modx->getOption('pageTpl', $this->config, 'PageLink');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $pageTpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $pageTpl));
             $this->config['pageTpl'] = (empty($chunk)) ? 'pagelink' : $pageTpl;
 
             // &pagingSeparator
@@ -492,17 +496,17 @@ class AdvSearchResults extends AdvSearch {
         } elseif ($this->config['pagingType'] == 3) {
             // &paging3Tpl [ chunk name | 'Paging3' ]
             $paging3Tpl = $this->modx->getOption('paging3Tpl', $this->config, 'Paging3');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $paging3Tpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging3Tpl));
             $this->config['paging3Tpl'] = (empty($chunk)) ? 'paging3' : $paging3Tpl;
 
             // &currentPageTpl [ chunk name | 'CurrentPageLink' ]
             $currentPageTpl = $this->modx->getOption('paging3CurrentPageTpl', $this->config, 'CurrentPageLink');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $currentPageTpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $currentPageTpl));
             $this->config['paging3CurrentPageTpl'] = (empty($chunk)) ? 'currentpagelink' : $currentPageTpl;
 
             // &pageTpl [ chunk name | 'PageLink' ]
             $pageTpl = $this->modx->getOption('paging3PageLinkTpl', $this->config, 'PageLink');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $pageTpl));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $pageTpl));
             $this->config['paging3PageLinkTpl'] = (empty($chunk)) ? 'pagelink' : $pageTpl;
 
             // &pagingSeparator
@@ -517,7 +521,7 @@ class AdvSearchResults extends AdvSearch {
             // &pagingRangeSplitter
 
             $paging3RangeSplitter = $this->modx->getOption('paging3RangeSplitterTpl', $this->config, 'Paging3RangeSplitter');
-            $chunk = $this->modx->getObject('modChunk', array('name' => $paging3RangeSplitter));
+            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging3RangeSplitter));
             $this->config['paging3RangeSplitterTpl'] = (empty($chunk)) ? 'paging3rangesplitter' : $paging3RangeSplitter;
         }
 
@@ -529,7 +533,7 @@ class AdvSearchResults extends AdvSearch {
             if ($this->config['moreResults']) {
                 // &moreResultsTpl [ chunk name | 'MoreResults' ]
                 $moreResultsTpl = $this->modx->getOption('moreResultsTpl', $this->config, 'MoreResults');
-                $chunk = $this->modx->getObject('modChunk', array('name' => $moreResultsTpl));
+                $chunk = $this->modx->getObject(modChunk::class, array('name' => $moreResultsTpl));
                 $this->config['moreResultsTpl'] = (empty($chunk)) ? 'moreresults' : $moreResultsTpl;
             }
         }

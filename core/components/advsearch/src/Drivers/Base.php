@@ -1,12 +1,16 @@
 <?php
+namespace AdvSearch\Drivers;
 
-include_once dirname(dirname(__FILE__)) . "/model/advsearch/advsearch.class.php";
+use MODX\Revolution\modX;
+use MODX\Revolution\modResource;
+use xPDO\Om\xPDOQuery;
+use AdvSearch\AdvSearch;
 
-abstract class AdvSearchEngineController extends AdvSearch {
+abstract class Base extends AdvSearch {
 
     public $modx;
     public $config;
-    public $mainClass = 'modResource';
+    public $mainClass = modResource::class;
     public $primaryKey = 'id';
     public $mainFields = array();
     public $joinedFields = array();

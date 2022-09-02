@@ -1,5 +1,5 @@
 <?php
-
+use AdvSearch\AdvSearchRequest;
 /**
  * AdvSearch
  *
@@ -32,21 +32,6 @@ if ($init !== 'all') {
 $as = $modx->getOption('asId', $scriptProperties, 'as0') ? $scriptProperties['asId'] : 'as0';
 $as = str_replace(' ', '', $as);
 
-$defaultAdvSearchCorePath = $modx->getOption('core_path') . 'components/advsearch/';
-$advSearchCorePath = $modx->getOption('advsearch.core_path', null, $defaultAdvSearchCorePath);
-
-try {
-    $$as = $modx->getService('advsearchrequest', 'AdvSearchRequest', $advSearchCorePath . 'model/advsearch/', $scriptProperties);
-} catch (Exception $e) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearchRequest] ' .  $e->getMessage());
-    return;
-}
-
-if (!($$as instanceof AdvSearchRequest)) {
-    $modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearchRequest] AdvSearchRequest class was not found.');
-    return false;
-}
-
-$output = $$as->output();
-
+$searchRequest = new AdvSearchRequest($modx, $scriptProperties);
+$output = $searchRequest->output();
 return $output;

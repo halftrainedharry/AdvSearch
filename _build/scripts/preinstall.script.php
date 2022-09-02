@@ -40,22 +40,13 @@
  */
 $modx = & $object->xpdo;
 
-
 $modx->log(xPDO::LOG_LEVEL_INFO, 'Running PHP Validator.');
 switch ($options[xPDOTransport::PACKAGE_ACTION]) {
     case xPDOTransport::ACTION_INSTALL:
 
         $modx->log(xPDO::LOG_LEVEL_INFO, 'Checking for installed AdvSearch add-on ');
         $success = true;
-        /* check for requirements */
-        // Revo version >= 2.1
-        $modx->log(xPDO::LOG_LEVEL_INFO, ' >>> Checking for Revo version compability ');
-        $versionData = $modx->getVersionData();
-        $version = (float) "{$versionData['version']}.{$versionData['major_version']}{$versionData['minor_version']}";
-        if ($version < 2.08) {
-            $modx->log(xPDO::LOG_LEVEL_ERROR, 'This package requires at least the version 2.0.8 of MODx Revo. Please upgrade your MODx install');
-            $success = false;
-        }
+
         // check that multibyte string option is on
         $modx->log(xPDO::LOG_LEVEL_INFO, ' >>> Checking for Multibyte string option ');
         $usemb = $modx->getOption('use_multibyte', null, false);

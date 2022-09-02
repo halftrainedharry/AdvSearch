@@ -1,5 +1,9 @@
 <?php
+namespace AdvSearch;
 
+use MODX\Revolution\modX;
+use AdvSearch\AdvSearch;
+use AdvSearch\AdvSearchResults;
 /**
  * AdvSearch - AdvSearchHooks
  *
@@ -291,7 +295,7 @@ class AdvSearchHooks {
     }
 
     public function processConditions($andConditions, & $requests) {
-        $conditions = array(); 
+        $conditions = array();
 
         foreach ($andConditions as $keyCondition => $valueCondition) {
             $keyElts = array_map("trim", @explode(':', $keyCondition));
@@ -377,7 +381,7 @@ class AdvSearchHooks {
                 }
             }
         }
-        
+
         return $conditions;
     }
     /**
