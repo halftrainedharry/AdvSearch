@@ -1,0 +1,496 @@
+name: AdvSearch
+lowCaseName: advsearch
+description: >-
+  AdvSearch is an advanced search extra for MODX 3. It allows search in dynamic contents, setting up of faceted search and searching in custom packages.
+author: Coroico
+version: 3.0.0-alpha
+chunks:
+  - name: AdvSearchForm
+    description: SearchForm for AdvSearch
+    file: searchform.chunk.tpl
+  - name: AdvSearchResults
+    description: Results for AdvSearch
+    file: searchresults.chunk.tpl
+  - name: AdvSearchResult
+    description: Result for AdvSearch
+    file: searchresult.chunk.tpl
+  - name: Extract
+    description: Extract for AdvSearch
+    file: extract.chunk.tpl
+  - name: Paging1
+    description: Paging type 1 for AdvSearch
+    file: paging1.chunk.tpl
+  - name: Paging2
+    description: Paging type 2 for AdvSearch
+    file: paging2.chunk.tpl
+  - name: Paging3
+    description: Paging type 3 for AdvSearch
+    file: paging3.chunk.tpl
+  - name: Paging3RangeSplitter
+    description: Paging splitter for paging type 3 of AdvSearch
+    file: paging3rangesplitter.chunk.tpl
+  - name: PageLink
+    description: Page Link for AdvSearch
+    file: pagelink.chunk.tpl
+  - name: CurrentPageLink
+    description: Current Page Link for AdvSearch
+    file: currentpagelink.chunk.tpl
+  - name: HelpLink
+    description: Link for AdvSearch Help
+    file: helplink.chunk.tpl
+  - name: ResultsWindow
+    description: Div section to set the ajax window of results
+    file: resultswindow.chunk.tpl
+  - name: MoreResults
+    description: More results link of the ajax window of results
+    file: moreresults.chunk.tpl
+snippets:
+  - name: AdvSearch
+    description: AdvSearch snippet to get the output.
+    file: advsearch.snippet.php
+    properties:
+      - name: asId
+        description: advsearch.advsearch_asId_desc
+        type: textfield
+        value: as0
+        lexicon: advsearch:properties
+      - name: containerTpl
+        description: advsearch.advsearch_containerTpl_desc
+        type: textfield
+        value: AdvSearchResults
+        lexicon: advsearch:properties
+      - name: contexts
+        description: advsearch.advsearch_contexts_desc
+        type: textfield
+        value: web
+        lexicon: advsearch:properties
+      - name: currentPageTpl
+        description: advsearch.advsearch_currentPageTpl_desc
+        type: textfield
+        value: CurrentPageLink
+        lexicon: advsearch:properties
+      - name: debug
+        description: advsearch.advsearch_debug
+        type: combo-boolean
+        value: '0'
+        lexicon: advsearch:properties
+      - name: fields
+        description: advsearch.advsearch_fields_desc
+        type: textfield
+        value: pagetitle,longtitle,alias,description,introtext,content
+        lexicon: advsearch:properties
+      - name: docindexPath
+        description: advsearch.advsearch_docindexPath_desc
+        type: textfield
+        value: docindex/
+        lexicon: advsearch:properties
+      - name: effect
+        description: advsearch.advsearch_effect_desc
+        type: list
+        options:
+          - text: basic
+            value: basic
+          - text: showfade
+            value: showfade
+          - text: slidefade
+            value: slidefade
+        value: basic
+        lexicon: advsearch:properties
+      - name: engine
+        description: advsearch.advsearch_engine_desc
+        type: list
+        options:
+          - text: mysql
+            value: mysql
+          - text: zend
+            value: zend
+          - text: all
+            value: all
+        value: mysql
+        lexicon: advsearch:properties
+      - name: extractEllipsis
+        description: advsearch.advsearch_extractEllipsis_desc
+        type: textfield
+        value: ...
+        lexicon: advsearch:properties
+      - name: extractLength
+        description: advsearch.advsearch_extractLength_desc
+        type: numberfield
+        value: '200'
+        lexicon: advsearch:properties
+      - name: extractTpl
+        description: advsearch.advsearch_extractTpl_desc
+        type: textfield
+        value: Extract
+        lexicon: advsearch:properties
+      - name: fieldPotency
+        description: advsearch.advsearch_fieldPotency_desc
+        type: textfield
+        value: createdon
+        lexicon: advsearch:properties
+      - name: highlightClass
+        description: advsearch.advsearch_highlightClass_desc
+        type: textfield
+        value: advsea-highlight
+        lexicon: advsearch:properties
+      - name: highlightResults
+        description: advsearch.advsearch_highlightResults_desc
+        type: combo-boolean
+        value: '1'
+        lexicon: advsearch:properties
+      - name: highlightTag
+        description: advsearch.advsearch_highlightTag_desc
+        type: textfield
+        value: span
+        lexicon: advsearch:properties
+      - name: hideContainers
+        description: advsearch.advsearch_hideContainers_desc
+        type: list
+        options:
+          - text: Search in all documents
+            value: '0'
+          - text: Don't search in documents marked as container.
+            value: '1'
+        value: '0'
+        lexicon: advsearch:properties
+      - name: hideMenu
+        description: advsearch.advsearch_hideMenu_desc
+        type: list
+        options:
+          - text: Search only in visible documents
+            value: '0'
+          - text: Search only in hidden documents
+            value: '1'
+          - text: Search in hidden and visible documents
+            value: '2'
+        value: '2'
+        lexicon: advsearch:properties
+      - name: ids
+        description: advsearch.advsearch_ids_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+      - name: includeTVs
+        description: advsearch.advsearch_includeTVs_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+      - name: init
+        description: advsearch.advsearch_init_desc
+        type: list
+        options:
+          - text: None
+            value: none
+          - text: All
+            value: all
+        value: none
+        lexicon: advsearch:properties
+      - name: libraryPath
+        description: advsearch.advsearch_libraryPath_desc
+        type: textfield
+        value: libraries/
+        lexicon: advsearch:properties
+      - name: maxWords
+        description: advsearch.advsearch_maxWords_desc
+        type: numberfield
+        value: '20'
+        lexicon: advsearch:properties
+      - name: method
+        description: advsearch.advsearch_method_desc
+        type: list
+        options:
+          - text: POST
+            value: POST
+          - text: GET
+            value: GET
+        value: GET
+        lexicon: advsearch:properties
+      - name: minChars
+        description: advsearch.advsearch_minChars_desc
+        type: numberfield
+        value: '3'
+        lexicon: advsearch:properties
+      - name: moreResults
+        description: advsearch.advsearch_moreResults_desc
+        type: numberfield
+        value: '0'
+        lexicon: advsearch:properties
+      - name: moreResultsTpl
+        description: advsearch.advsearch_moreResultsTpl_desc
+        type: textfield
+        value: MoreResults
+        lexicon: advsearch:properties
+      - name: offsetIndex
+        description: advsearch.advsearch_offsetIndex_desc
+        type: textfield
+        value: offset
+        lexicon: advsearch:properties
+      - name: output
+        description: advsearch.advsearch_output_desc
+        type: textfield
+        value: html
+        lexicon: advsearch:properties
+      - name: pagingSeparator
+        description: advsearch.advsearch_pagingSeparator_desc
+        type: textfield
+        value: ' | '
+        lexicon: advsearch:properties
+      - name: pagingType
+        description: advsearch.advsearch_pagingType_desc
+        type: list
+        options:
+          - text: No pagination
+            value: '0'
+          - text: Paging type 1
+            value: '1'
+          - text: Paging type 2
+            value: '2'
+        value: '1'
+        lexicon: advsearch:properties
+      - name: pageTpl
+        description: advsearch.advsearch_pageTpl_desc
+        type: textfield
+        value: PageLink
+        lexicon: advsearch:properties
+      - name: paging1Tpl
+        description: advsearch.advsearch_paging1Tpl_desc
+        type: textfield
+        value: Paging1
+        lexicon: advsearch:properties
+      - name: paging2Tpl
+        description: advsearch.advsearch_paging2Tpl_desc
+        type: textfield
+        value: Paging2
+        lexicon: advsearch:properties
+      - name: perPage
+        description: advsearch.advsearch_perPage_desc
+        type: numberfield
+        value: '10'
+        lexicon: advsearch:properties
+      - name: placeholderPrefix
+        description: advsearch.advsearch_placeholderPrefix_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+      - name: queryHook
+        description: advsearch.advsearch_queryHook_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+      - name: searchIndex
+        description: advsearch.advsearch_searchIndex_desc
+        type: textfield
+        value: search
+        lexicon: advsearch:properties
+      - name: sortby
+        description: advsearch.advsearch_sortby_desc
+        type: textfield
+        value: createdon DESC
+        lexicon: advsearch:properties
+      - name: showExtract
+        description: advsearch.advsearch_showExtract_desc
+        type: textfield
+        value: 1:content
+        lexicon: advsearch:properties
+      - name: toPlaceholder
+        description: advsearch.advsearchform_toPlaceholder_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+      - name: tpl
+        description: advsearch.advsearch_tpl_desc
+        type: textfield
+        value: AdvSearchResult
+        lexicon: advsearch:properties
+      - name: urlScheme
+        description: advsearch.advsearch_urlScheme_desc
+        type: list
+        options:
+          - text: relative to site_url
+            value: '-1'
+          - text: prepended with site_url from config
+            value: full
+          - text: prepended with base_url from config
+            value: abs
+          - text: absolute url, forced to http scheme
+            value: http
+          - text: absolute url, forced to https scheme
+            value: https
+        value: '-1'
+        lexicon: advsearch:properties
+      - name: withFields
+        description: advsearch.advsearch_withFields_desc
+        type: textfield
+        value: pagetitle,longtitle,alias,description,introtext,content
+        lexicon: advsearch:properties
+      - name: withTVs
+        description: advsearch.advsearch_withTVs_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+  - name: AdvSearchForm
+    description: AdvSearchForm snippet to render search form.
+    file: advsearchform.snippet.php
+    properties:
+      - name: addCss
+        description: advsearch.advsearchform_addCss_desc
+        type: combo-boolean
+        value: '1'
+        lexicon: advsearch:properties
+      - name: addJQuery
+        description: advsearch.advsearchform_addJQuery_desc
+        type: list
+        options:
+          - text: No
+            value: '0'
+          - text: Before closing HEAD tag
+            value: '1'
+          - text: Before closing BODY tag
+            value: '2'
+        value: '1'
+        lexicon: advsearch:properties
+      - name: addJs
+        description: advsearch.advsearchform_addJs_desc
+        type: list
+        options:
+          - text: No
+            value: '0'
+          - text: Before closing HEAD tag
+            value: '1'
+          - text: Before closing BODY tag
+            value: '2'
+        value: '1'
+        lexicon: advsearch:properties
+      - name: ajaxResultsId
+        description: advsearch.advsearchform_ajaxResultsId_desc
+        type: numberfield
+        value: '0'
+        lexicon: advsearch:properties
+      - name: asId
+        description: advsearch.advsearchform_asId_desc
+        type: textfield
+        value: as0
+        lexicon: advsearch:properties
+      - name: clearDefault
+        description: advsearch.advsearchform_clearDefault_desc
+        type: combo-boolean
+        value: '1'
+        lexicon: advsearch:properties
+      - name: debug
+        description: advsearch.advsearchform_debug_desc
+        type: combo-boolean
+        value: '0'
+        lexicon: advsearch:properties
+      - name: help
+        description: advsearch.advsearchform_help_desc
+        type: combo-boolean
+        value: '1'
+        lexicon: advsearch:properties
+      - name: jsSearchForm
+        description: advsearch.advsearchform_jsSearchForm_desc
+        type: textfield
+        value: assets/components/advsearch/js/advsearchform.min.js
+        lexicon: advsearch:properties
+      - name: jsJQuery
+        description: advsearch.advsearchform_jsJQuery_desc
+        type: textfield
+        value: assets/components/advsearch/js/jquery-1.7.1.min.js
+        lexicon: advsearch:properties
+      - name: landing
+        description: advsearch.advsearchform_landing_desc
+        type: numberfield
+        value: '0'
+        lexicon: advsearch:properties
+      - name: liveSearch
+        description: advsearch.advsearchform_liveSearch_desc
+        type: combo-boolean
+        value: '0'
+        lexicon: advsearch:properties
+      - name: method
+        description: advsearch.advsearchform_method_desc
+        type: list
+        options:
+          - text: POST
+            value: POST
+          - text: GET
+            value: GET
+        value: GET
+        lexicon: advsearch:properties
+      - name: opacity
+        description: advsearch.advsearchform_opacity_desc
+        type: numberfield
+        value: '1.'
+        lexicon: advsearch:properties
+      - name: searchIndex
+        description: advsearch.advsearchform_searchIndex_desc
+        type: textfield
+        value: search
+        lexicon: advsearch:properties
+      - name: toPlaceholder
+        description: advsearch.advsearchform_toPlaceholder_desc
+        type: textfield
+        value: ''
+        lexicon: advsearch:properties
+      - name: tpl
+        description: advsearch.advsearchform_tpl_desc
+        type: textfield
+        value: AdvSearchForm
+        lexicon: advsearch:properties
+      - name: urlScheme
+        description: advsearch.advsearchform_urlScheme_desc
+        type: list
+        options:
+          - text: relative to site_url
+            value: '-1'
+          - text: prepended with site_url from config
+            value: full
+          - text: prepended with base_url from config
+            value: abs
+          - text: absolute url, forced to http scheme
+            value: http
+          - text: absolute url, forced to https scheme
+            value: https
+        value: '-1'
+        lexicon: advsearch:properties
+      - name: withAjax
+        description: advsearch.advsearchform_withAjax_desc
+        type: list
+        options:
+          - text: Non-ajax mode
+            value: '0'
+          - text: Ajax mode
+            value: '1'
+        value: '0'
+        lexicon: advsearch:properties
+  - name: AdvSearchGmapInfoWindow
+    description: AdvSearch snippet for AdvSearch's googlemap infobox.
+    file: advsearch.gmapinfowindow.snippet.php
+plugins:
+    - name: AdvSearch
+      description: AdvSearch to clear cache on its partition.
+      file: advsearch.plugin.php
+      events:
+        - OnDocFormSave
+        - OnTemplateSave
+        - OnTempFormSave
+        - OnTVFormSave
+        - OnSnipFormSave
+        - OnPluginFormSave
+        - OnMediaSourceFormSave
+        - OnChunkFormSave
+        - OnSiteRefresh
+    - name: AdvSearchSolr
+      description': AdvSearch's plugin to handle Solr engine's indexer when changing the documents
+      file: advsearch.solr.plugin.php
+      events:
+        - OnDocFormSave
+        - OnDocPublished
+        - OnDocUnPublished
+        - OnResourceDuplicate
+        - OnResourceDelete
+        - OnResourceUndelete
+build:
+  scriptsBefore: [preinstall.script.php]
+  scriptsAfter: [install.script.php]
+  requires:
+      modx: '>=3.0.0-alpha'
