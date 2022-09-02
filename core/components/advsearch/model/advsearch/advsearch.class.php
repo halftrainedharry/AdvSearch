@@ -83,8 +83,8 @@ class AdvSearch {
 
         //===============================================================================================================================
         // path and url
-        $corePath = $this->modx->getOption('advSearch.core_path', null, $this->modx->getOption('core_path') . 'components/advsearch/');
-        $assetsUrl = $this->modx->getOption('advSearch.assets_url', null, 'assets/components/advsearch/');
+        $corePath = $this->modx->getOption('advsearch.core_path', null, $this->modx->getOption('core_path') . 'components/advsearch/');
+        $assetsUrl = $this->modx->getOption('advsearch.assets_url', null, 'assets/components/advsearch/');
         $this->config = array_merge(array(
             'corePath' => $corePath,
             'assetsUrl' => $assetsUrl,

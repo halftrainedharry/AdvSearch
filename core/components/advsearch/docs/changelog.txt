@@ -1,5 +1,9 @@
 Changelog for AdvSearch
 
+AdvSearch 3.0.0-alpha
+-------------------
+- support for Solr removed
+
 AdvSearch 2.0.0-beta1
 -------------------
 - apply placeholder's prefix in all chunks

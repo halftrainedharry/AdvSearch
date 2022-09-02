@@ -386,16 +386,6 @@ snippets:
         type: combo-boolean
         value: '1'
         lexicon: advsearch:properties
-      - name: jsSearchForm
-        description: advsearch.advsearchform_jsSearchForm_desc
-        type: textfield
-        value: assets/components/advsearch/js/advsearchform.min.js
-        lexicon: advsearch:properties
-      - name: jsJQuery
-        description: advsearch.advsearchform_jsJQuery_desc
-        type: textfield
-        value: assets/components/advsearch/js/jquery-1.7.1.min.js
-        lexicon: advsearch:properties
       - name: landing
         description: advsearch.advsearchform_landing_desc
         type: numberfield
@@ -479,18 +469,7 @@ plugins:
         - OnMediaSourceFormSave
         - OnChunkFormSave
         - OnSiteRefresh
-    - name: AdvSearchSolr
-      description': AdvSearch's plugin to handle Solr engine's indexer when changing the documents
-      file: advsearch.solr.plugin.php
-      events:
-        - OnDocFormSave
-        - OnDocPublished
-        - OnDocUnPublished
-        - OnResourceDuplicate
-        - OnResourceDelete
-        - OnResourceUndelete
 build:
   scriptsBefore: [preinstall.script.php]
-  scriptsAfter: [install.script.php]
   requires:
       modx: '>=3.0.0-alpha'

@@ -20,6 +20,5 @@ The technical pre-requisites for AdvSearch are:
 
 Optionals:
 - ZendSearch library 1.12 (Read installation chapter first) <https://github.com/zendframework/ZendSearch>
-- solarium <http://www.solarium-project.org/> for Solr's search engine <http://lucene.apache.org/solr/>
 
 AdvSearch uses JQuery 1.10.2 (included in the package).
