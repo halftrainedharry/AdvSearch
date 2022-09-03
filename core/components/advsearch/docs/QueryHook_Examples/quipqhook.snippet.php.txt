@@ -1,0 +1,65 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * Query hook for the quip demo
+ *
+ */
+
+/*
+  Joined classes:
+
+    package - The name of the schema Package to add.
+    packagePath - The path to the model/ directory where the package is located. Use {core_path} as generic variable.
+    class - The class name of the table you want to search. e.g: quipComment
+
+    and optionally:
+
+    withFields - A comma-separated list of column names where to search.
+    fields - A comma-separated list of column names to display. By default same fields name as withFields. An alias could be provided.
+    joinCriteria - The SQL condition to join the table you want to search and an other table.
+    where - criteria or Array of criteria. Column names should be prefixed by class name and wrapped with backticks. e.g: "`dvdProducts`.`studio` = 'Warner Bros' "
+
+*/
+
+$joined = array(
+    array(
+        'package' => 'quip',
+        'class' => 'quipComment',
+        'packagePath' => '{core_path}components/quip/model/',
+        'fields' => 'author , body , createdon ',   // displayed fields
+        'withFields' => 'body',                     // search only in body field
+        'where' => array(                            // where clause is primordial to avoid to search inside unapproved comments
+            '((`quipComment`.`deleted` IS NULL) OR (`quipComment`.`deleted` = 0))',
+            '((`quipComment`.`approved` IS NULL) OR (`quipComment`.`approved` = 1))'
+        ),
+        'joinCriteria' => 'quipComment.resource = modResource.id'
+    )
+);
+
+$since = strip_tags($_REQUEST['since']);
+if (preg_match('#^(0[1-9]|[12][0-9]|3[01])([- /.])(0[1-9]|1[012])\2(19|20\d\d)$#', $since, $match)) {
+    $sincedate = $match[0]; // eg: 21/08/2011
+    $tssince = mktime(0, 0, 0, $match[3], $match[1], $match[4]);
+    $andConditions = array(
+        'quipComment.createdon:>' => "{$tssince}:numeric"   // to get all the comments since $sincedate
+    );
+
+    // propagate the http request variable for pagination
+    $requests['since'] = $sincedate;
+}
+
+
+// set the query hook declaration
+$qhDeclaration = array(
+    'qhVersion' => '1.2',       // version of queryHook - to manage futures changes
+    'joined' => $joined,
+    'andConditions' => $andConditions,
+    'requests' => $requests
+);
+
+$hook->setQueryHook($qhDeclaration);
+
+return true;

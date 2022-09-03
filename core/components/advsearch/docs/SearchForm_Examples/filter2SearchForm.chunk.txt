@@ -1,0 +1,49 @@
+<form id="[[+asId]]_advsea-form" class="advsea-form" action="[[~[[+landing]]]]" method="[[+method]]">
+  <fieldset>
+    <input type="hidden" name="id" value="[[+landing]]" />
+    <input type="hidden" name="asId" value="[[+asId]]" />
+    <label>Select a subject:&nbsp;
+	<select name="ctg" >
+		<option value="all" selected="selected">- All subjects -</option>
+		<option>Arts</option>
+		<option>Countries</option>
+		<option>Geography</option>
+		<option>Litterature</option>
+		<option>Music</option>
+	</select>
+    </label>   
+    <br /><br />
+    <label>with a mark between:&nbsp;
+    <select name="minf">
+		<option value="none" selected="selected"></option>
+		<option>0</option>
+		<option>1</option>
+		<option>2</option>
+		<option>3</option>
+		<option>4</option>
+		<option>5</option>
+		<option>6</option>
+		<option>7</option>
+		<option>8</option>
+		<option>9</option>
+		<option>10</option>
+	</select> and <select name="msup">
+		<option value="none" selected="selected"></option>
+		<option>0</option>
+		<option>1</option>
+		<option>2</option>
+		<option>3</option>
+		<option>4</option>
+		<option>5</option>
+		<option>6</option>
+		<option>7</option>
+		<option>8</option>
+		<option>9</option>
+		<option>10</option>
+	</select>
+    </label>
+    <br /><br />
+    [[+liveSearch:isnot=`1`:then=`<input type="submit" id="[[+asId]]_advsea-submit"  name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />`]]
+  </fieldset>
+</form>
+[[+resultsWindow]]

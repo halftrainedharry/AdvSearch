@@ -1,0 +1,54 @@
+<form id="[[+asId]]_advsea-form" class="advsea-form" action="[[~[[+landing]]]]" method="[[+method]]">
+  <fieldset>
+    <input type="hidden" name="id" value="[[+landing]]" />
+    <input type="hidden" name="asId" value="[[+asId]]" />
+    <label>[[%select_category? &namespace=`wangba` &topic=`default`]]:&nbsp;
+	<select name="ctg" >
+		<option value="all" selected="selected">- All subjects -</option>
+		<option>Arts</option>
+		<option>Countries</option>
+		<option>Geography</option>
+		<option>Litterature</option>
+		<option>Music</option>
+	</select>
+    </label>   
+    <br /><br />
+    <label>[[%select_tag? &namespace=`wangba` &topic=`default`]]:&nbsp;
+    <select name="tag[]" multiple="multiple">
+		<option value="all" selected="selected">- All tags -</option>
+		<option>Bolivia</option>
+		<option>Chile</option>
+		<option>China</option>
+		<option>France</option>
+		<option>Gosciny</option>
+		<option>Hugo Pratt</option>
+		<option>Indonesia</option>
+		<option>Journalism</option>
+		<option>La Réunion</option>
+		<option>Nicaragua</option>
+		<option>Painting</option>
+		<option>Russia</option>
+		<option>Travel</option>
+		<option>USA</option>
+		<option>Uderzo</option>
+		<option>Van Gogh</option>
+		<option>Yungas</option>
+		<option>adventure</option>
+		<option>author</option>
+		<option>castel</option>
+		<option>city</option>
+		<option>comics</option>
+		<option>guide book</option>
+		<option>indian</option>
+		<option>monastery</option>
+		<option>punk rock</option>
+		<option>settlements</option>
+		<option>travel</option>
+		<option>volcano</option>
+	</select>
+    </label>
+    <br /><br />
+    [[+liveSearch:isnot=`1`:then=`<input type="submit" id="[[+asId]]_advsea-submit"  name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />`]]
+  </fieldset>
+</form>
+[[+resultsWindow]]

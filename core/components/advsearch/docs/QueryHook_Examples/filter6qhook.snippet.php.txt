@@ -1,0 +1,24 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * QueryHook for Faceted search demo 6
+ *
+ */
+
+$andConditions = array(
+    'tv.articleCategory:REGEXP' => 'ctg:request:all',
+    'tv.articleTags:REGEXP' => 'tag:request:all'
+);
+
+$qhDeclaration = array(
+    'qhVersion' => '1.2',
+	'sortby' => 'sort',		
+	'perPage' => 'ppage',	
+	'andConditions' => $andConditions
+);
+
+$hook->setQueryHook($qhDeclaration);
+return true;

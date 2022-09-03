@@ -1,0 +1,34 @@
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * QueryHook for Ajax faceted search demo 7
+ *
+ */
+
+// get the form parameters
+$asform = (isset($_REQUEST['asform'])) ? strip_tags($_REQUEST['asform']) : '';
+$formParams = (array) json_decode(strip_tags($asform));
+
+// read area value
+$area = isset($formParams['area']) ? $formParams['area'] : 'en';
+
+// get the list of ids with GetIds
+if ($area == 'fr') $parent = '39'; // french documents
+else $parent = '38'; // english documents
+
+$ids = $modx->getChildIds($parent, 10); //get the array of ids of the children resources
+$lstids = implode(',',$ids);
+
+$andConditions = array(
+    'modResource.id:IN' => $lstids . ':integer'
+);
+
+$qhDeclaration = array(
+    'qhVersion' => '1.1',
+	'andConditions' => $andConditions
+);
+
+$hook->setQueryHook($qhDeclaration);
+return true;

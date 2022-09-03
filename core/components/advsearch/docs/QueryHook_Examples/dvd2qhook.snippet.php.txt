@@ -1,0 +1,121 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * Query hook for the Dvd shop demo 2
+ *
+ */
+
+/*
+  Main class:
+
+    package - The name of the schema Package to add. e.g: dvd
+    packagePath - The path to the model/ directory where the package is located. Use {core_path} as generic variable.
+    class - The class name of the table you want to search. e.g: dvd
+
+	and optionally (these parameters could be passed thru the snippet call):
+
+    withFields - A comma-separated list of column names where to search.
+	fields - A comma-separated list of column names to display.
+	ids - A comma-separated list of primary keys to filter where the search should occurs.
+    where - criteria or Array of criteria. e.g: "studio IN ('20th Century Fox','DreamWorks Home Ent.','Warner Bros') "
+	sortby - csv list of couple 'columnName (ASC| DESC)'.
+
+
+  Joined classes:
+
+    package - The name of the schema Package to add.
+    packagePath - The path to the model/ directory where the package is located. Use {core_path} as generic variable.
+    class - The class name of the table you want to search. e.g: quipComment
+
+	and optionally:
+
+    withFields - A comma-separated list of column names where to search.
+	fields - A comma-separated list of column names to display. By default same fields name as withFields. An alias could be provided.
+    joinCriteria - The SQL condition to join the table you want to search and an other table.
+    where - criteria or Array of criteria.
+
+*/
+
+// =================  As example a search inside "Science Fiction" Products with results ordered by genre and by name.
+
+$main = array(
+    'package' => 'dvd',
+    'packagePath' => '{core_path}components/dvd/model/',
+    'class' => 'dvdProducts',
+    'fields' => 'code , category_id , name , tags , price , weight , image , image_thmb , in_stock , enabled , studio , production_year , release_date , length, description', // displayed
+    'withFields' => 'name , tags , studio , description', // where we do the search
+	'sortby' => 'dvdProducts.studio DESC, dvdProducts.name ASC'
+);
+
+$joined = array(
+    array(
+        'package' => 'dvd',
+        'class' => 'dvdCategories',
+        'packagePath' => '{core_path}components/dvd/model/',
+        'fields' => 'name , description',
+        'withFields' => 'name , description',
+        'joinCriteria' => 'dvdCategories.id = dvdProducts.category_id'
+    )
+);
+
+$andConditions = array(
+	'dvdCategories.name:=' => 'ctg',
+	'dvdProducts.tags:=' => 'genre',
+	'dvdProducts.studio:=' => 'studio'
+);
+
+$requests = array();
+
+// production year
+$tag = 'year';
+$year = strip_tags($_GET[$tag]);
+if (!empty($year)) {
+    if ($year == '1960<') {
+		$andConditions['dvdProducts.production_year:<'] = '1960:numeric';
+    }
+    elseif ($year == '>2010') {
+        $andConditions['dvdProducts.production_year:>'] = '2010:numeric';
+    }
+    else {
+        list($yinf,$ysup) = explode('-',$year);
+		$andConditions['dvdProducts.production_year:>='] = $yinf.':numeric';
+		$andConditions['dvdProducts.production_year:<='] = $ysup.':numeric';
+    }
+
+    // propagate the http request variable for pagination
+    $requests['year'] = $year;
+}
+
+// price
+$tag = 'price';
+$price = strip_tags($_GET[$tag]);
+if (!empty($price)) {
+    $vprice = substr($price,0,-1); // to clear the money unit
+    if ($vprice == '>25') {
+		$andConditions['dvdProducts.price:>'] = '25:numfield';
+    }
+    else {
+        list($pinf,$psup) = explode('-',$vprice);
+		$andConditions['dvdProducts.price:>='] = $pinf.':numfield';
+		$andConditions['dvdProducts.price:<='] = $psup.':numfield';
+    }
+
+    // propagate the http request variable for pagination
+    $requests['price'] = $price;
+}
+
+// set the query hook declaration
+$qhDeclaration = array(
+    'qhVersion' => '1.2',       // version of queryHook - to manage futures changes
+	'main' => $main,
+	'joined' => $joined,
+	'andConditions' => $andConditions,
+	'requests' => $requests
+);
+
+$hook->setQueryHook($qhDeclaration);
+
+return true;

@@ -1,0 +1,8 @@
+<div class="advsea-result">
+    <h3>[[+idx]]. <a href="[[+link:is=``:then=`[[~[[+id]]]]`:else=`[[+link]]`]]" title="[[+longtitle]]">[[+pagetitle]]</a></h3>
+    <div class="imgArticle"><img src="assets/images/articles/[[+articleImage]]" height="120px" /></div>
+    <div>[[+extracts]]</div>
+    <div><span class="flash">[[%category? &namespace=`wangba` &topic=`default`]]:</span> [[+articleCategory]]</div>
+    <div><span class="flash">[[%tags? &namespace=`wangba` &topic=`default`]]:</span><ul> [[+articleTags]]</ul></div>
+    <div><span class="flash">[[%mark? &namespace=`wangba` &topic=`default`]]:</span> [[+articleMark]]</div>
+</div>

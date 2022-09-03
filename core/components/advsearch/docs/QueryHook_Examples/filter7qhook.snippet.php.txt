@@ -1,0 +1,31 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * QueryHook for Faceted search demo 7
+ *
+ */
+
+$tag = 'area';
+$area = (isset($_REQUEST[$tag])) ? strip_tags($_REQUEST[$tag]) : 'en';
+
+// get the list of ids with GetIds
+if ($area == 'fr') $parent = '39';
+else $parent = '38';
+
+$ids = $modx->getChildIds($parent, 10); //get the array of ids of the children resources
+$lstids = implode(',',$ids);
+
+$andConditions = array(
+    'modResource.id:IN' => $lstids . ':integer'
+);
+
+$qhDeclaration = array(
+    'qhVersion' => '1.1',
+	'andConditions' => $andConditions
+);
+
+$hook->setQueryHook($qhDeclaration);
+return true;

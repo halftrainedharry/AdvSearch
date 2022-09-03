@@ -1,0 +1,16 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * QueryHook for Faceted search demo 5
+ *
+ */
+
+$qhDeclaration = array(
+	'sortby' => 'sort'	// ‘sort’ is the html tag name to catch the array of fields used to sort results
+);
+
+$hook->setQueryHook($qhDeclaration);
+return true;

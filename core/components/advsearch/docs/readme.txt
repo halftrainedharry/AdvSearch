@@ -14,8 +14,8 @@ See AdvSearch documentations in core/components/advsearch/docs/
 Thanks for using AdvSearch!
 
 The technical pre-requisites for AdvSearch are:
-- Revo 2.1 and newer
+- MODX 3
 - UTF-8 charset
-- php multi-bytes setting ON
+- PHP multi-bytes setting ON
 
 AdvSearch uses jQuery 1.10.2 (included in the package).

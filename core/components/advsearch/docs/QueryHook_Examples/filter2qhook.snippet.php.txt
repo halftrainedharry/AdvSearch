@@ -1,0 +1,23 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * QueryHook for Faceted search demo 2
+ *
+ */
+
+$andConditions = array(
+    'tv.articleCategory:=' => 'ctg:request:all',
+    'tv.articleMark:>=' => 'minf:request:none',
+    'tv.articleMark:<=' => 'msup:request:none'
+);
+
+$qhDeclaration = array(
+    'qhVersion' => '1.2',
+	'andConditions' => $andConditions
+);
+
+$hook->setQueryHook($qhDeclaration);
+return true;

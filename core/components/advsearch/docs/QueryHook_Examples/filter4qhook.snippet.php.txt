@@ -1,0 +1,18 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * QueryHook for Faceted search demo 4
+ *
+ */
+
+$perPage = 'ppage';
+
+$qhDeclaration = array(
+	'perPage' => $perPage
+);
+
+$hook->setQueryHook($qhDeclaration);
+return true;

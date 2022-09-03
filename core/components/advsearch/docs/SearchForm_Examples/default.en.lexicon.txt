@@ -1,0 +1,7 @@
+<?php
+
+$_lang['select_category'] = 'Select a category';
+$_lang['select_tag'] = 'and may be an additional tag';
+$_lang['category'] = 'Category';
+$_lang['tags'] = 'Tags';
+$_lang['mark'] = 'Mark';

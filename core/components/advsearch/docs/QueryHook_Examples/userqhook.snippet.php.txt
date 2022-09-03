@@ -1,0 +1,30 @@
+<?php
+/**
+ * AdvSearch
+ *
+ * Copyright 2012 by Coroico <coroico@wangba.fr>
+ *
+ * Query hook for the join with modUser demo
+ *
+ */
+
+$joined = array(
+    array(
+        'package' => 'modx', 
+        'class' => 'modUser', 
+        'packagePath' => '{core_path}/model/', 
+        'fields' => 'username ', 
+        'joinCriteria' => 'modUser.id = modResource.publishedby'
+    )
+);
+
+
+// set the query hook declaration
+$qhDeclaration = array(
+    'qhVersion' => '1.2',       // version of queryHook - to manage futures changes
+    'joined' => $joined
+);
+
+$hook->setQueryHook($qhDeclaration);
+
+return true;
