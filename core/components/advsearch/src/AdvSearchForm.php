@@ -47,11 +47,8 @@ class AdvSearchForm extends AdvSearch {
         // initialize searchString
         $this->searchString = $this->_initSearchString();
 
-        // &help - [ 1 | 0 ] - to add a help link near the search form
-        $this->config['help'] = (bool) (int) $this->modx->getOption('help', $this->config, 1);
-
-        //jQuery used by the help and by ajax mode
-        if ($this->config['help'] || $this->config['withAjax']) {
+        //jQuery used by ajax mode
+        if ($this->config['withAjax']) {
             // &addJQuery - [ 0 | 1 | 2 ]
             $addJQuery = (int) $this->modx->getOption('addJQuery', $this->config, 1);
             $this->config['addJQuery'] = ($addJQuery == 0 || $addJQuery == 1 || $addJQuery == 2) ? $addJQuery : 1;
@@ -61,36 +58,6 @@ class AdvSearchForm extends AdvSearch {
         }
 
         // set up the search form
-        // add the help link
-        if ($this->config['help']) {
-            $helpHandler = $this->config['help'];
-            if ($helpHandler != 1) {
-                // specific help handler provided
-                $resource = $this->modx->getObject(modResource::class, [
-                    'id' => $helpHandler,
-                    'published' => 1
-                ]);
-            } else {
-                $resource = $this->modx->getObject(modResource::class, [
-                    'published' => 1,
-                    'pagetitle' => 'AdvSearch help'
-                ]);
-            }
-            if ($resource) {   // advSearchHelp handler exists
-                $helpHandler = $resource->get('id');
-                $placeholders = array(
-                    'asId' => $this->config['asId'],
-                    'helpId' => $this->modx->makeUrl($helpHandler)
-                );
-                $helpLink = $this->parseTpl('HelpLink', $placeholders);
-            } else {
-                $this->config['help'] = 0;
-                $helpLink = '';
-            }
-        } else {
-            $helpLink = '';
-        }
-
         // &resultsWindowTpl [ chunk name | 'ResultsWindow' ]
         $this->config['resultsWindowTpl'] = $this->modx->getOption('resultsWindowTpl', $this->config, 'ResultsWindow');
 
@@ -126,7 +93,6 @@ class AdvSearchForm extends AdvSearch {
             'asId' => $this->config['asId'],
             'searchValue' => $this->searchString,
             'searchIndex' => $this->config['searchIndex'],
-            'helpLink' => $helpLink,
             'liveSearch' => $this->config['liveSearch'],
             'resultsWindow' => $resultsWindow
         );
@@ -157,20 +123,14 @@ class AdvSearchForm extends AdvSearch {
         // &clearDefault - [ 1 | 0 ]
         $this->config['clearDefault'] = (bool) (int) $this->modx->getOption('clearDefault', $this->config, 0);
 
-        // include or not the jQuery library (required for help, clear default text, ajax mode)
-        if ($this->config['help'] || $this->config['clearDefault'] || $this->config['withAjax']) {
+        // include or not the jQuery library (required for clear default text, ajax mode)
+        if ($this->config['clearDefault'] || $this->config['withAjax']) {
             if ($this->config['addJQuery'] == 1) {
                 //regClientStartupHTMLBlock
                 $this->modx->regClientStartupHTMLBlock('<script>window.jQuery || document.write(\'<script src="' . $this->config['jsJQuery'] . '"><\/script>\');</script>');
             } elseif ($this->config['addJQuery'] == 2) {
                 $this->modx->regClientHTMLBlock('<script>window.jQuery || document.write(\'<script src="' . $this->config['jsJQuery'] . '"><\/script>\');</script>');
             }
-        }
-
-        if ($this->config['help']) {
-            // add help handler id in js header
-            $jsHeaderArray['asid'] = $this->config['asId'];
-            $jsHeaderArray['hid'] = $helpHandler; // add the help handler id as js variable
         }
 
         if ($this->config['clearDefault']) {

@@ -33,7 +33,6 @@ $_lang['advsearch.advsearchform_ajaxResultsId_desc'] = 'Ajax response page; Blan
 $_lang['advsearch.advsearchform_asId_desc'] = 'Unique id for newSearch instance.';
 $_lang['advsearch.advsearchform_clearDefault_desc'] = 'Set this to 0 if you wouldn\'t like the clear default text feature.';
 $_lang['advsearch.advsearchform_debug_desc'] = 'Debug';
-$_lang['advsearch.advsearchform_help_desc'] = 'Add a help link near the search form';
 $_lang['advsearch.advsearchform_jsSearchForm_desc'] = 'Url where is located the js library used with the form (Fields validation, clearDefault, ...)';
 $_lang['advsearch.advsearchform_jsJQuery_desc'] = 'Url where is located the jquery javascript library.';
 $_lang['advsearch.advsearchform_landing_desc'] = 'The resource that the AdvSearch snippet is called on, that will display the results of the search';

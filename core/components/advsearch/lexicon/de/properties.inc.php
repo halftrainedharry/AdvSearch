@@ -36,7 +36,6 @@ $_lang['advsearch.advsearchform_ajaxResultsId_desc']     = 'Ajax Response Seite;
 $_lang['advsearch.advsearchform_asId_desc']              = 'Eindeutige ID f&uuml; neue Instanzen von AdvSearch.';
 $_lang['advsearch.advsearchform_clearDefault_desc']      = 'Stellen Sie diesen Eintrag auf 0, wenn Sie die automatische Clear Funktion f&uuml;r den standard Text im Suchfeld nicht verwenden m&ouml;chten.';
 $_lang['advsearch.advsearchform_debug_desc']             = 'Debug';
-$_lang['advsearch.advsearchform_help_desc']              = 'Hilfe Link im Suchformular anzeigen.';
 $_lang['advsearch.advsearchform_jsSearchForm_desc']      = 'Pfad (URL) zum JavaScript Library, welches f&uuml; das Suchformular verwendet werden soll. (Feld Validierung, clearDefault, usw.)';
 $_lang['advsearch.advsearchform_jsJQuery_desc']          = 'Pfad (URL) zum jQuery Library, welches f&uuml; AdvSearch verwendet werden soll.';
 $_lang['advsearch.advsearchform_landing_desc']           = 'Resource, welche f&uuml;r die Anzeige der Suchergebnisse verwendet werden soll (muss AdvSearch Snippet Aufruf enthalten).';

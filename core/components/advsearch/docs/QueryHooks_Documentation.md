@@ -167,7 +167,7 @@ With filter1SearchForm content as:
                 <option>Music</option>
             </select>
         </label>
-        <br /><br />
+        <br><br>
         <label>and may be an additional tag:&nbsp;
             <select name="tag[]" multiple="multiple">
                 <option value="all" selected="selected">- All tags -</option>
@@ -179,7 +179,7 @@ With filter1SearchForm content as:
                 <option>volcano</option>
             </select>
         </label>
-        <br /><br />
+        <br><br>
         <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
     </fieldset>
 </form>
@@ -271,7 +271,7 @@ With as content for the chunk 'filter2SearchForm':
                 <option>Music</option>
             </select>
         </label>
-        <br /><br />
+        <br><br>
         <label>with a mark between
             <select name="minf">
                 <option value="none" selected="selected"></option>
@@ -293,7 +293,7 @@ With as content for the chunk 'filter2SearchForm':
                 <option>10</option>
             </select>
         </label>
-        <br /><br />
+        <br><br>
         <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
     </fieldset>
 </form>
@@ -361,10 +361,10 @@ With as content for the chunk 'dvd2SearchForm':
     <fieldset>
     <input type="hidden" name="id" value="[[+landing]]" />
     <input type="hidden" name="asId" value="[[+asId]]" />
-    <label>Title or description:<br />[[+helpLink]]&nbsp;
+    <label>Title or description:<br>
         <input type="text" id="[[+asId]]_search" name="[[+searchIndex]]" value="[[+searchValue]]" />
     </label>
-    <br /><br />
+    <br><br>
     <label><span>Category: </span>
         <select name="ctg" ><option selected></option>
             <option >Animation</option>
@@ -372,7 +372,7 @@ With as content for the chunk 'dvd2SearchForm':
             <option >Television</option>
         </select>
     </label>
-    <br /><br />
+    <br><br>
     <label><span>Genre: </span>
         <select name="genre" ><option selected></option>
             <option >Action</option>
@@ -384,7 +384,7 @@ With as content for the chunk 'dvd2SearchForm':
             <option >Western</option>
         </select>
     </label>
-    <br /><br />
+    <br><br>
     <label><span>Studio: </span>
         <select name="studio" ><option selected></option>
             <option >20th Century Fox</option>
@@ -393,7 +393,7 @@ With as content for the chunk 'dvd2SearchForm':
             <option >Warner Bros</option>
         </select>
     </label>
-    <br /><br />
+    <br><br>
     <label><span>Year of production: </span>
         <select name="year" ><option selected></option>
             <option >1960<</option>
@@ -405,7 +405,7 @@ With as content for the chunk 'dvd2SearchForm':
             <option >>2011</option>
         </select>
     </label>
-    <br /><br />
+    <br><br>
     <label><span>Price range: </span>
         <select name="price" ><option selected></option>
             <option >05-10$</option>
@@ -415,7 +415,7 @@ With as content for the chunk 'dvd2SearchForm':
             <option >>25$</option>
         </select>
     </label>
-    <br /><br />
+    <br><br>
     <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
     </fieldset>
 </form>
@@ -581,10 +581,9 @@ With as content for the chunk 'filter4SearchForm':
     <fieldset>
         <input type="hidden" name="id" value="[[+landing]]" />
         <input type="hidden" name="asId" value="[[+asId]]" />
-        [[+helpLink]]
         <input type="text" id="[[+asId]]_search" name="[[+searchIndex]]" value="[[+searchValue]]" />
         <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
-        <br /><br />
+        <br><br>
         <label>Select the number of results per page:&nbsp;
             <select name="ppage" >
                 <option selected="selected">5</option>
@@ -639,10 +638,9 @@ With as content for the chunk 'filter5SearchForm':
     <fieldset>
         <input type="hidden" name="id" value="[[+landing]]" />
         <input type="hidden" name="asId" value="[[+asId]]" />
-        [[+helpLink]]
         <input type="text" id="[[+asId]]_search" name="[[+searchIndex]]" value="[[+searchValue]]" />
         <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
-        <br /><br />
+        <br><br>
         <label>Choose how you want sort the search results:&nbsp;
             <select name="sort" >
                 <option value="pagetitle ASC" selected="selected">pagetitle ASC</option>

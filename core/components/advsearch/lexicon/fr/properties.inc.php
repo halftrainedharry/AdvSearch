@@ -33,7 +33,6 @@ $_lang['advsearch.advsearchform_ajaxResultsId_desc'] = 'Page de réponse Ajax; T
 $_lang['advsearch.advsearchform_asId_desc'] = 'id unique pour une instance advsearch.';
 $_lang['advsearch.advsearchform_clearDefault_desc'] = 'Mettre à 0 si vous ne voulez pas de la fonctionalité d\'effacement du texte par défaut.';
 $_lang['advsearch.advsearchform_debug_desc'] = 'Debogueur';
-$_lang['advsearch.advsearchform_help_desc'] = 'Ajoute le lien vers l\'aide à côté du formulaire de recherche.';
 $_lang['advsearch.advsearchform_jsSearchForm_desc'] = 'Url où se trouve la librairie js utilisé avec le formulaire de recherche (Validation de champs, effacement du texte par défaut ...)';
 $_lang['advsearch.advsearchform_jsJQuery_desc'] = 'Url où se trouve la librairie javascript JQuery.';
 $_lang['advsearch.advsearchform_landing_desc'] = 'La resource utilisé par advSearch pour afficher les résultats de la recherche.';

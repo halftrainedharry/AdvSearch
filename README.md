@@ -6,7 +6,7 @@ AdvSearch is a search extra for **Modx Revolution**. It supports results highlig
 
 ## Requirements
 
- * Revo 2.1 and upper (PHP and MySQL versions)
+ * MODX 3
  * UTF-8 charset
  * PHP multi-bytes setting ON
  * jQuery 1.10.2 (provided with AdvSearch)

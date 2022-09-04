@@ -35,9 +35,6 @@ chunks:
   - name: CurrentPageLink
     description: Current Page Link for AdvSearch
     file: currentpagelink.chunk.tpl
-  - name: HelpLink
-    description: Link for AdvSearch Help
-    file: helplink.chunk.tpl
   - name: ResultsWindow
     description: Div section to set the ajax window of results
     file: resultswindow.chunk.tpl
@@ -371,11 +368,6 @@ snippets:
         description: advsearch.advsearchform_debug_desc
         type: combo-boolean
         value: '0'
-        lexicon: advsearch:properties
-      - name: help
-        description: advsearch.advsearchform_help_desc
-        type: combo-boolean
-        value: '1'
         lexicon: advsearch:properties
       - name: landing
         description: advsearch.advsearchform_landing_desc

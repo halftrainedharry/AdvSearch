@@ -2,9 +2,9 @@
   <fieldset>
     <input type="hidden" name="id" value="[[+landing]]" />
     <input type="hidden" name="asId" value="[[+asId]]" />
-    [[+helpLink]]<input type="text" id="[[+asId]]_advsea-search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+    <input type="text" id="[[+asId]]_advsea-search" name="[[+searchIndex]]" value="[[+searchValue]]" />
     [[+liveSearch:isnot=`1`:then=`<input type="submit" id="[[+asId]]_advsea-submit"  name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />`]]
-    <br /><br />    
+    <br /><br />
     <label>Sort your search results:&nbsp;
 		<select name="sort" >
 			<option value="pagetitle ASC" selected="selected">pagetitle ASC</option>
@@ -13,12 +13,12 @@
 			<option value="longtitle">longtitle</option>
 			<option value="createdon ASC">date of creation ASC</option>
 			<option value="createdon">date of creation</option>
-			<option value="articleCategory ASC">articleCategory ASC</option>	
-			<option value="articleCategory">articleCategory</option>	
+			<option value="articleCategory ASC">articleCategory ASC</option>
+			<option value="articleCategory">articleCategory</option>
 			<option value="articleMark ASC">articleMark ASC</option>
 			<option value="articleMark">articleMark</option>
 		</select>
-    </label>	
+    </label>
   </fieldset>
 </form>
 [[+resultsWindow]]

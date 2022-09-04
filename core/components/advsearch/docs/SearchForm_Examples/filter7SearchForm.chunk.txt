@@ -2,13 +2,13 @@
   <fieldset>
     <input type="hidden" name="id" value="[[+landing]]" />
     <input type="hidden" name="asId" value="[[+asId]]" />
-    [[+helpLink]]<input type="text" id="[[+asId]]_advsea-search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+    <input type="text" id="[[+asId]]_advsea-search" name="[[+searchIndex]]" value="[[+searchValue]]" />
     [[+liveSearch:isnot=`1`:then=`<input type="submit" id="[[+asId]]_advsea-submit"  name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />`]]
     <br /><br />
     <div>
       <input type="radio" checked="checked" value="en" name="area" id="area_fr" /><label for="area_fr"> English documents</label>&nbsp;&nbsp;
       <input type="radio" value="fr" name="area" id="area_en" /><label for="area_en"> French documents</label>
-    </div> 
+    </div>
   </fieldset>
 </form>
 [[+resultsWindow]]

@@ -16,7 +16,6 @@ Basic usage:
 | :--- | :--- | :--- |
 | asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: ‘as2’. a-z, _ , 0-9 (case sensitive) | as0   |
 | clearDefault | clearing default text. Include the clear default js function in header and add the class "cleardefault" to the input text form.| 1 |
-| help | whether to set or not a link to help window. The help is provided by an ajax request to a resource named “AdvSearchHelp handler” which call the AdvSearchHelp snippet. If you would like use an another ajax handler, specify his resource id in the help parameter ( different of 0 or 1). This handler should return a html document. | 1 |
 | addCss | to add the default css file to the web pages automatically. 0: not included. You should add the css manually. 1: included before the closing HEAD tag | 1 |
 | addJs | to add the javascript files to the web pages automatically. 0: not included. You should add them manually. 1: included before the closing HEAD tag 2: included before the closing BODY tag| 1 |
 | jsSearchForm | full path name of the javascript file to link with the form. This js file include the clearDefault function and could be modified to add custom features. full path name under /assets | assets/components/advsearch/js/advSearchForm.min.js |
@@ -124,9 +123,6 @@ These placeholders are related to templates.
 [[+resultsWindow]]
 : `<div></div>` section where will be attached the search results window.
 
-[[+helpLink]]
-: where is displayed the link for opening the advanced search help
-
 [[+etime]]
 : Server elapsed time of the search.
 
@@ -186,10 +182,6 @@ Should contain:
 
 And possibly:<br>
 * an input text named `"[[+asId]]"_search`
-
-### HelpLink
-
-default chunk provided to style the link to open the advSearch help window Should contain an id: `id="[[+asId]]_helplink"`
 
 ### ResultsWindow
 
