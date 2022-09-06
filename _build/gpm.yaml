@@ -7,40 +7,37 @@ version: 3.0.0-alpha
 chunks:
   - name: AdvSearchForm
     description: SearchForm for AdvSearch
-    file: searchform.chunk.tpl
+    file: AdvSearchForm.chunk.tpl
   - name: AdvSearchResults
     description: Results for AdvSearch
-    file: searchresults.chunk.tpl
+    file: AdvSearchResults.chunk.tpl
   - name: AdvSearchResult
     description: Result for AdvSearch
-    file: searchresult.chunk.tpl
-  - name: Extract
+    file: AdvSearchResult.chunk.tpl
+  - name: AdvSearchExtract
     description: Extract for AdvSearch
-    file: extract.chunk.tpl
-  - name: Paging1
+    file: AdvSearchExtract.chunk.tpl
+  - name: AdvSearchPaging1
     description: Paging type 1 for AdvSearch
-    file: paging1.chunk.tpl
-  - name: Paging2
+    file: AdvSearchPaging1.chunk.tpl
+  - name: AdvSearchPaging2
     description: Paging type 2 for AdvSearch
-    file: paging2.chunk.tpl
-  - name: Paging3
+    file: AdvSearchPaging2.chunk.tpl
+  - name: AdvSearchPaging3
     description: Paging type 3 for AdvSearch
-    file: paging3.chunk.tpl
-  - name: Paging3RangeSplitter
-    description: Paging splitter for paging type 3 of AdvSearch
-    file: paging3rangesplitter.chunk.tpl
-  - name: PageLink
+    file: AdvSearchPaging3.chunk.tpl
+  - name: AdvSearchPageLink
     description: Page Link for AdvSearch
-    file: pagelink.chunk.tpl
-  - name: CurrentPageLink
+    file: AdvSearchPageLink.chunk.tpl
+  - name: AdvSearchCurrentPageLink
     description: Current Page Link for AdvSearch
-    file: currentpagelink.chunk.tpl
-  - name: ResultsWindow
+    file: AdvSearchCurrentPageLink.chunk.tpl
+  - name: AdvSearchResultsWindow
     description: Div section to set the ajax window of results
-    file: resultswindow.chunk.tpl
-  - name: MoreResults
+    file: AdvSearchResultsWindow.chunk.tpl
+  - name: AdvSearchMoreResults
     description: More results link of the ajax window of results
-    file: moreresults.chunk.tpl
+    file: AdvSearchMoreResults.chunk.tpl
 snippets:
   - name: AdvSearch
     description: AdvSearch snippet to get the output.
@@ -55,15 +52,10 @@ snippets:
         type: textfield
         value: AdvSearchResults
         lexicon: advsearch:properties
-      - name: contexts
-        description: advsearch.advsearch_contexts_desc
-        type: textfield
-        value: web
-        lexicon: advsearch:properties
       - name: currentPageTpl
         description: advsearch.advsearch_currentPageTpl_desc
         type: textfield
-        value: CurrentPageLink
+        value: AdvSearchCurrentPageLink
         lexicon: advsearch:properties
       - name: debug
         description: advsearch.advsearch_debug
@@ -95,7 +87,7 @@ snippets:
             value: MySql
           - text: All
             value: All
-        value: mysql
+        value: MySql
         lexicon: advsearch:properties
       - name: extractEllipsis
         description: advsearch.advsearch_extractEllipsis_desc
@@ -110,7 +102,7 @@ snippets:
       - name: extractTpl
         description: advsearch.advsearch_extractTpl_desc
         type: textfield
-        value: Extract
+        value: AdvSearchExtract
         lexicon: advsearch:properties
       - name: fieldPotency
         description: advsearch.advsearch_fieldPotency_desc
@@ -234,22 +226,14 @@ snippets:
             value: '1'
           - text: Paging type 2
             value: '2'
+          - text: Paging type 3
+            value: '3'
         value: '1'
         lexicon: advsearch:properties
       - name: pageTpl
         description: advsearch.advsearch_pageTpl_desc
         type: textfield
-        value: PageLink
-        lexicon: advsearch:properties
-      - name: paging1Tpl
-        description: advsearch.advsearch_paging1Tpl_desc
-        type: textfield
-        value: Paging1
-        lexicon: advsearch:properties
-      - name: paging2Tpl
-        description: advsearch.advsearch_paging2Tpl_desc
-        type: textfield
-        value: Paging2
+        value: AdvSearchPageLink
         lexicon: advsearch:properties
       - name: perPage
         description: advsearch.advsearch_perPage_desc
@@ -358,11 +342,6 @@ snippets:
         description: advsearch.advsearchform_asId_desc
         type: textfield
         value: as0
-        lexicon: advsearch:properties
-      - name: clearDefault
-        description: advsearch.advsearchform_clearDefault_desc
-        type: combo-boolean
-        value: '1'
         lexicon: advsearch:properties
       - name: debug
         description: advsearch.advsearchform_debug_desc

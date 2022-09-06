@@ -56,17 +56,8 @@ class AdvSearchRequest extends AdvSearch {
         // &cacheQuery [ 0 | 1 ]
         $this->config['cacheQuery'] = (bool) $this->modx->getOption('cacheQuery', $this->config, 0);
 
-        // &cacheTime [ 0 | 1 ]
+        // &cacheTime [ integer in seconds ]
         $this->config['cacheTime'] = (int) $this->modx->getOption('cacheTime', $this->config, 7200);
-
-        // &cacheType [ output | values ]
-        $cacheType = $this->modx->getOption('cacheType', $this->config);
-        if ($cacheType === 'html') {
-            $this->config['cacheType'] = 'html';
-        } else {
-            // default
-            $this->config['cacheType'] = 'array';
-        }
 
         // &parents [ comma delimited integers ]
         $this->config['parents'] = $this->modx->getOption('parents', $this->config);
@@ -104,9 +95,6 @@ class AdvSearchRequest extends AdvSearch {
             $this->config['effect'] = $this->modx->getOption('effect', $this->config, 'basic');
         }
 
-        // &clearDefault [ 0| 1 ]
-        $this->config['clearDefault'] = (bool) $this->modx->getOption('clearDefault', $this->config, 0);
-
         $this->_initSearchString();
 
         // initialise page of results
@@ -134,9 +122,7 @@ class AdvSearchRequest extends AdvSearch {
          * Start the searching from here
          */
         $doQuery = true;
-        if ($this->config['cacheQuery']
-//                && $this->config['cacheType'] === 'html'
-        ) {
+        if ($this->config['cacheQuery']) {
             $key = serialize(array_merge($this->config, $asContext));
             $hash = md5($key);
             $cacheOptions = array(xPDO::OPT_CACHE_KEY => 'advsearch');
@@ -182,7 +168,6 @@ class AdvSearchRequest extends AdvSearch {
                 $out['pgt'] = $this->config['pagingType'];
                 $out['opc'] = $this->config['opacity'];
                 $out['eff'] = $this->config['effect'];
-                $out['cdf'] = $this->config['clearDefault'];
 
                 $output = json_encode($out);
             } else {
@@ -193,9 +178,7 @@ class AdvSearchRequest extends AdvSearch {
                 }
             }
 
-            if ($this->config['cacheQuery'] && $outputCount > 0 && !empty($output)
-//                    && $this->config['cacheType'] === 'html'
-            ) {
+            if ($this->config['cacheQuery'] && $outputCount > 0 && !empty($output)) {
                 $cache = array(
                     'results' => $output,
                     'resultsCount' => $outputCount,

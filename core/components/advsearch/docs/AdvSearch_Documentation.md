@@ -5,19 +5,22 @@
     - [Google Maps Properties](#google-maps-properties)
   - [AdvSearch](#advsearch)
     - [Properties](#properties-1)
+    - [Paging Properties](#paging-properties)
+    - [Properties for Extracts and Highlights](#properties-for-extracts-and-highlights)
     - [Ajax mode Properties](#ajax-mode-properties-1)
   - [AdvSearchGmapInfoWindow](#advsearchgmapinfowindow)
     - [Properties](#properties-2)
   - [Placeholders](#placeholders)
   - [Chunks](#chunks)
     - [AdvSearchForm](#advsearchform-1)
-    - [ResultsWindow](#resultswindow)
+    - [AdvSearchResultsWindow](#advsearchresultswindow)
     - [AdvSearchResult](#advsearchresult)
     - [AdvSearchResults](#advsearchresults)
-    - [Paging1](#paging1)
-    - [Paging2](#paging2)
-    - [PageLink](#pagelink)
-    - [CurrentPageLink](#currentpagelink)
+    - [AdvSearchPaging1](#advsearchpaging1)
+    - [AdvSearchPaging2](#advsearchpaging2)
+    - [AdvSearchPaging3](#advsearchpaging3)
+    - [AdvSearchPageLink](#advsearchpagelink)
+    - [AdvSearchCurrentPageLink](#advsearchcurrentpagelink)
   - [AdvSearch Glossary](#advsearch-glossary)
 
 # AdvSearch Documentation
@@ -36,13 +39,11 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: ‘as2’. a-z, _ , 0-9 (case sensitive) | as0 |
-| clearDefault | clearing default text. Include the clear default js function in header and add the class "cleardefault" to the input text form.| 1 |
+| asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: 'as2'. a-z, _ , 0-9 (case sensitive) | as0 |
 | addCss | to add the default css file to the web pages automatically. 0: not included. You should add the css manually. 1: included before the closing HEAD tag | 1 |
 | addJs | to add the javascript files to the web pages automatically. 0: not included. You should add them manually. 1: included before the closing HEAD tag 2: included before the closing BODY tag| 1 |
-| jsSearchForm | full path name of the javascript file to link with the form. This js file include the clearDefault function and could be modified to add custom features. full path name under /assets | assets/components/advsearch/js/advSearchForm.min.js |
 | landing | the resource id that the AdvSearch snippet is called on, that will display the results of the search. Mandatory if you would like display the results on another page. | 0 => current document id |
-| method | whether to send the search over POST or GET. ‘POST’ | ‘GET’ | GET |
+| method | whether to send the search over POST or GET. 'POST' | 'GET' | GET |
 | searchIndex | the name of the REQUEST parameter that the search will use. | search |
 | searchString | to initialize the search with a default searchString. Used in conjunction with ``&init=`all` `` this allow to display search results for a specific search string. | '' => empty string |
 | toPlaceholder | whether to set the output to directly return, or set to a placeholder with this propertys name. placeholder name | '' (empty string) => directly returned |
@@ -84,47 +85,70 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: ‘as2’. a-z, _ , 0-9 (case sensitive) | as0 |
+| asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: 'as2'. a-z, _ , 0-9 (case sensitive) | as0 |
+| tpl | The chunk that will be used to display the contents of each search result. | AdvSearchResult |
 | containerTpl | the chunk that will be used to wrap all the search results, pagination and message. | AdvSearchResults |
-| contexts | The contexts to search. comma separated list of contexts | Defaults to the current context if none are explicitly specified. |
-| currentPageTpl | The chunk to use for a pagination link. | CurrentPageLink |
 | fields | The list of fields available with search results. comma separated list of fields | pagetitle,longtitle,alias,description,introtext,content |
-| engine | Search engine selected | MySql |
-| extractEllipsis | ellipside to mark the start and the end of an extract when the sentence is cutting | '...' (three dots) |
-| extractLength | length of separate extraction. 50 < Integer < 800 | 200 |
-| extractTpl | The chunk that will be used to wrap each extract | Extract |
-| fieldPotency | potency per field. comma separated list of field : potency. Default potency to 1 if not set | createdon |
-| highlightClass | The CSS class name to add to highlighted terms in results. | advsea-highlight |
-| highlightResults | create links so that search terms will be highlighted when linked page clicked. Requires Highlight plugin | 1 |
-| highlightTag | The html tag to wrap the highlighted term with in search results. | span |
-| hideContainers | Search in container resources. 0 : search in all resources. 1 : will not search in any resources marked as a container (is_folder). | 0 |
-| hideMenu | search in hidden documents from menu. 0 : search only in documents visible from menu.· 1 : search only in documents hidden from menu.· 2 : search in hidden or visible documents
-from menu | 2 |
-| ids | Comma-delimited list of ids to search in. Use GetIds addon to specify complex list of ids. | '' => empty string |
-| includeTVs | Add TVs values to search results and set them as placeholders. Comma separated list of tv names | '' => empty string |
-| init | defines if the search display all the results or none when the page is loaded at the first time. Options: 'none', 'all' | none |
-| maxWords | maximum number of words for searching | 20 |
-| method | whether to send the search over POST or GET. Options: ‘POST’, ‘GET’ | GET |
-| minChars | Minimum number of characters to require for a word to be valid for searching. 2 < int < 100 | 2 |
-| offsetIndex | The name of the offset parameter that the search will use. | offset |
-| output | output type. Opt: ‘html’, ‘json’. 'json' : Array of all results as json string. 'html' : Page of results as html string | html |
-| pagingType | selection of the type of pagination. 1: Previous - X-Y /Z – Next. 2: Results Pages 1 \| 2 \| 3 | 1 |
-| pageTpl | The chunk to use for a pagination link. Used only by paging0 type. | PageLink |
-| paging1Tpl | The chunk to use for the paging type 1. | Paging1 |
-| paging2Tpl | The chunk to use for the paging type 2. | Paging2 |
-| pagingSeparator | String used to separate number page links. Used only by paging0 type. | ' \| ' |
-| perPage | Set to the max number of results you would like on each page. Set to 0 if unlimited. | 10 |
+| withFields | Define which fields are used for the search in fields of document resource. Comma separated list of fields from modResource. e.g: `pagetitle,introtext` : the search occurs only inside these 2 fields | pagetitle,longtitle,alias,description,introtext,content |
+| includeTVs | Add TVs values to search results and set them as placeholders. Comma separated list of tv names | |
+| withTvs | Define which Tvs are used for the search in Tvs. Comma separated list of tv names. e.g: `tv1,tv2,tv3` : the search occurs only inside these 3 TVs. | |
+| sortby | comma separated list of couple "field [ASC|DESC]" to sort by. field could be : field name or TV name. Field name of joined resource are prefixed by resource name. e.g: equipComment_body | createdon DESC |
+| **Limit resources to search in** | | |
+| ids | A comma-separated list of IDs to restrict the search to. Use  the *GetIds* addon to specify a complex list of ids. | |
+| parents | A comma-separated list of parent IDs to restrict the search to the direct children of these particular containers. | |
+| contexts | The contexts to search in. Comma separated list of contexts | Defaults to the current context if none are explicitly specified. |
+| hideContainers | Search in container resources. 0 => Search in all resources; 1 => Will not search in any resources marked as a container (is_folder). | 0 |
+| hideMenu | Whether or not to search in documents that are hidden from the menu. 0 => Search only in documents visible from menu;· 1 => Search only in documents hidden from menu;· 2 => Search in both | 2 |
+| hideLinks | Exclude Symlinks and Weblinks from the search | 0 |
+| **Output** | | |
+| output | output type. Opt: 'html', 'json'. 'json' : Array of all results as json string. 'html' : Page of results as html string | html |
+| toPlaceholder | whether to set the output to directly return, or set to a placeholder with this propertys name. | '' (empty string) => directly returned |
+| **Hooks** | | |
+| queryHook | A query hook to change the default query. A snippet name to run as queryHook. See the [QueryHook documentation](QueryHooks_Documentation.md). | |
 | postHook | A post hook to change the displaying of results. A snippet name to run as postHook. e.g: To display the results as a table rather than as a list use the posthook feature. | |
 | postHookTpls | A comma separated list of chunks used by the postHook to change the display of results. e.g: To display the results as a table of results, you probably provide: the table header chunk and the row header chunk. | |
-| queryHook | A query hook to change the default query. A snippet name to run as queryHook. See the [QueryHook documentation](QueryHooks_Documentation.md). | |
+| **Request method and parameter Names** | | |
+| method | whether to send the search over POST or GET. Options: 'POST', 'GET' | GET |
+| searchIndex | the name of the REQUEST parameter that the search will use. | search |
+| pageIndex | | |
+| offsetIndex | The name of the offset parameter that the search will use. | offset |
+| **Cache** | | |
+| cacheQuery | Whether or not to cache the query | 0 |
+| cacheTime | How long the query should be cached in seconds | 7200 (= 2 hours) |
+| **Other settings** | | |
+| maxWords | maximum number of words for searching | 20 |
+| minChars | Minimum number of characters to require for a word to be valid for searching. 2 < int < 100 | 2 |
+| init | defines if the search display all the results or none when the page is loaded at the first time. Options: 'none', 'all' | none |
+| engine | Search engine selected | MySql |
+| fieldPotency | potency per field. comma separated list of field : potency. Default potency to 1 if not set | createdon |
 | searchString | to initialize the search with a default searchString. Used in conjunction with `&init=`all` ``. this allow to display search results for a specific search string. | |
-| showExtract | show the search terms highlighted in one or several extract. string as nb: csv list of fields. 5 stands for 5:content. e.g: 3: introtext,content => 3 extracts displayed from introtext . content | '1:content' => One extract displayed from content field |
-| sortby | comma separated list of couple "field [ASC|DESC]" to sort by. field could be : field name or TV name. Field name of joined resource are prefixed by resource name. e.g: equipComment_body | createdon DESC |
-| toPlaceholder | whether to set the output to directly return, or set to a placeholder with this propertys name. | '' (empty string) => directly returned |
-| tpl | The chunk that will be used to display the contents of each search result. | AdvSearchResult |
 | urlScheme | indicates in what format the URL is generated. Options: -1, full, abs, http, https | -1 => URL is relative to site_url |
-| withFields | Define which fields are used for the search in fields of document resource. Comma separated list of fields from modResource. e.g: `pagetitle,introtext` : the search occurs only inside these 2 fields | pagetitle,longtitle,alias,description,introtext,content |
-| withTvs | Define which Tvs are used for the search in Tvs. Comma separated list of tv names. e.g: `tv1,tv2,tv3` : the search occurs only inside these 3 TVs. | |
+
+### Paging Properties
+
+| Name | Description | Default |
+| :--- | :--- | :--- |
+| perPage | The number of search results to show per page. Set to 0 if unlimited. | 10 |
+| pagingType | The type of pagination. 0 => No paging; 1 => Previous – X-Y/Z – Next; 2 => Result Pages 1 \| 2 \| 3; 3 => Previous 1 \| 2 \| ... \| 7 \| 8 \| 9 \| ... \| 14 \| 15 Next  | 1 |
+| pagingTpl | The chunk to use for the whole paging navigation. | AdvSearchPaging1, AdvSearchPaging2 or AdvSearchPaging3 according to the pagingType setting |
+| pageTpl | The chunk to use for a single page link. Used by pagingType 2 & 3. | AdvSearchPageLink |
+| currentPageTpl | The chunk to use for the current page link. Used by pagingType 2 & 3. | AdvSearchCurrentPageLink |
+| pagingSeparator | The string used to separate page links in the paging-navigation. Used by pagingType 2 & 3. | ' \| ' |
+| paging3OuterRange | How many page links are visible at the start and the end of the navigation | 2 |
+| paging3MiddleRange | How many page links are visible in the middle section of the navigation around the current page. Minimum: 3 | 3 |
+| paging3RangeSplitterTpl | The chunk that is used for the content between middle and outer range | `@INLINE <span class="advsea-page"> ... </span>` |
+
+### Properties for Extracts and Highlights
+
+| Name | Description | Default |
+| :--- | :--- | :--- |
+| showExtract | show the search terms highlighted in one or several extract. string as nb: csv list of fields. 5 stands for 5:content. e.g: 3: introtext,content => 3 extracts displayed from introtext . content | '1:content' => One extract displayed from content field |
+| extractTpl | The chunk that will be used to wrap each extract | Extract |
+| extractEllipsis | ellipside to mark the start and the end of an extract when the sentence is cutting | '...' (three dots) |
+| extractLength | length of separate extraction. 50 < Integer < 800 | 200 |
+| highlightResults | create links so that search terms will be highlighted when linked page clicked. Requires Highlight plugin | 1 |
+| highlightClass | The CSS class name to add to highlighted terms in results. | advsea-highlight |
+| highlightTag | The html tag to wrap the highlighted term with in search results. | span |
 
 ### Ajax mode Properties
 
@@ -194,7 +218,7 @@ The search string used as query.
 The total number of result found.
 
 **[[+pagingType]]**<br>
-Paging type. 1 or 2
+Paging type. 1, 2 or 3
 
 **[[+page]]**<br>
 The current page number.
@@ -203,7 +227,7 @@ The current page number.
 The total number of result pages.
 
 **[[+perPage]]**<br>
-The maximum number of results par page.
+The maximum number of results per page.
 
 **[[+offset]]**<br>
 Offset of the current page.
@@ -235,7 +259,7 @@ Should contain:
 And possibly:<br>
 * an input text named `"[[+asId]]"_search`
 
-### ResultsWindow
+### AdvSearchResultsWindow
 
 default chunk provided to style the div section needed to set the ajax window of results. Should contain an id: `id="[[+asId]]_reswin"`
 
@@ -255,27 +279,31 @@ Should contain:
 * `[[+paging]]` to get the pagination
 * `[[+results]]` to get the search results
 
-### Paging1
+### AdvSearchPaging1
 
-default chunk provided to style the pagination type 1
+Default chunk provided to style the pagination type 1
 
 Should contain:
 * `[[+previousLink]]` to get the link to the
 previous page
 * `[[+nextLink]]` to get the link to the next page
 
-### Paging2
+### AdvSearchPaging2
 
-default chunk provided to style the pagination type 2.
+Default chunk provided to style the pagination type 2.
 
-### PageLink
+### AdvSearchPaging3
 
-default chunk provided to style the page number links. Used with paging type 0 only.
+Default chunk provided to style the pagination type 3.
 
-### CurrentPageLink
+### AdvSearchPageLink
 
-default chunk provided to style the current page number link.<br>
-Used with paging type 0 only.
+Default chunk provided to style the page number links. Used with paging types 2 & 3.
+
+### AdvSearchCurrentPageLink
+
+Default chunk provided to style the current page number link.<br>
+Used with paging types 2 & 3.
 
 ## AdvSearch Glossary
 

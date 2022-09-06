@@ -18,7 +18,6 @@ use AdvSearch\AdvSearchRequest;
  *
  * -----------------------------------------------------------------------------
  */
-$scriptProperties['contexts'] = $modx->getOption('contexts', $scriptProperties, $modx->context->key);
 $scriptProperties['fields'] = $modx->getOption('fields', $scriptProperties, 'pagetitle,longtitle,alias,description,introtext,content');
 
 // The first time display or not results

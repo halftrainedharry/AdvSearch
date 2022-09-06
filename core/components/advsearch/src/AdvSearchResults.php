@@ -157,26 +157,36 @@ class AdvSearchResults extends AdvSearch {
     private function _loadResultsProperties() {
         if (!empty($this->queryHook['main'])) { // a new main package is declared in query hook
             $msg = '';
-            if (empty($this->queryHook['main']['package'])) {
-                $msg = 'Main - Package name should be declared in queryHook';
-            } elseif (empty($this->queryHook['main']['packagePath'])) {
-                $msg = 'Main - Package path should be declared in queryHook';
-            } elseif (empty($this->queryHook['main']['class'])) {
+
+            if (empty($this->queryHook['main']['class'])) {
                 $msg = 'Main - Class name should be defined in queryHook';
-            }
-            if (!empty($msg)) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] ' . $msg, '', __METHOD__, __FILE__, __LINE__);
                 return false;
             }
-            $this->mainClass = $this->queryHook['main']['class'];  // main class
-            $this->queryHook['main']['packagePath'] = $this->replacePropPhs($this->queryHook['main']['packagePath']);
 
-            $tablePrefix = isset($this->queryHook['main']['tablePrefix']) ? $this->queryHook['main']['tablePrefix'] : $this->modx->config[modX::OPT_TABLE_PREFIX];
-            $added = $this->modx->addPackage($this->queryHook['main']['package'], $this->queryHook['main']['packagePath'], $tablePrefix); // add package
-            if (!$added) {
-                return false;
+            //Check if the class already exists
+            if (!class_exists($this->queryHook['main']['class'])) {
+                //Try adding the package
+                if (empty($this->queryHook['main']['package'])) {
+                    $msg = 'Main - Package name should be declared in queryHook';
+                } elseif (empty($this->queryHook['main']['packagePath'])) {
+                    $msg = 'Main - Package path should be declared in queryHook';
+                }
+
+                if (!empty($msg)) {
+                    $this->modx->log(modX::LOG_LEVEL_ERROR, '[AdvSearch] ' . $msg, '', __METHOD__, __FILE__, __LINE__);
+                    return false;
+                }
+
+                $this->queryHook['main']['packagePath'] = $this->replacePropPhs($this->queryHook['main']['packagePath']);
+                $tablePrefix = isset($this->queryHook['main']['tablePrefix']) ? $this->queryHook['main']['tablePrefix'] : $this->modx->config[modX::OPT_TABLE_PREFIX];
+                $added = $this->modx->addPackage($this->queryHook['main']['package'], $this->queryHook['main']['packagePath'], $tablePrefix); // add package
+                if (!$added) {
+                    return false;
+                }
             }
 
+            $this->mainClass = $this->queryHook['main']['class'];  // main class
             $this->primaryKey = $this->modx->getPK($this->mainClass); // get primary key
         }
 
@@ -407,14 +417,10 @@ class AdvSearchResults extends AdvSearch {
         $this->config['output'] = implode(',', $output);
 
         // &containerTpl [ chunk name | 'AdvSearchResults' ]
-        $containerTpl = $this->modx->getOption('containerTpl', $this->config, 'AdvSearchResults');
-        $chunk = $this->modx->getObject(modChunk::class, array('name' => $containerTpl));
-        $this->config['containerTpl'] = (empty($chunk)) ? 'searchresults' : $containerTpl;
+        $this->config['containerTpl'] = $this->modx->getOption('containerTpl', $this->config, 'AdvSearchResults');
 
         // &tpl [ chunk name | 'AdvSearchResult' ]
-        $tpl = $this->modx->getOption('tpl', $this->config, 'AdvSearchResult');
-        $chunk = $this->modx->getObject(modChunk::class, array('name' => $tpl));
-        $this->config['tpl'] = (empty($chunk)) ? 'searchresult' : $tpl;
+        $this->config['tpl'] = $this->modx->getOption('tpl', $this->config, 'AdvSearchResult');
 
         // &showExtract [ string | '1:content' ]
         $showExtractArray = explode(':', $this->modx->getOption('showExtract', $this->config, '1:content'));
@@ -449,9 +455,7 @@ class AdvSearchResults extends AdvSearch {
             $this->config['extractLength'] = (($extractLength < 800) && ($extractLength >= 50)) ? $extractLength : 200;
 
             // &extractTpl [ chunk name | 'Extract' ]
-            $extractTpl = $this->modx->getOption('extractTpl', $this->config, 'Extract');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $extractTpl));
-            $this->config['extractTpl'] = (empty($chunk)) ? 'extract' : $extractTpl;
+            $this->config['extractTpl'] = $this->modx->getOption('extractTpl', $this->config, 'AdvSearchExtract');
 
             // &highlightResults [ 0 | 1 ]
             $highlightResults = (int) $this->modx->getOption('highlightResults', $this->config, 1);
@@ -471,58 +475,43 @@ class AdvSearchResults extends AdvSearch {
         $this->config['pagingType'] = (($pagingType <= 3) && ($pagingType >= 0)) ? $pagingType : 1;
 
         if ($this->config['pagingType'] == 1) {
-            // &paging1Tpl [ chunk name | 'Paging1' ]
-            $paging1Tpl = $this->modx->getOption('paging1Tpl', $this->config, 'Paging1');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging1Tpl));
-            $this->config['paging1Tpl'] = (empty($chunk)) ? 'paging1' : $paging1Tpl;
+            // &pagingTpl [ chunk name | 'AdvSearchPaging1' ]
+            $this->config['pagingTpl'] = $this->modx->getOption('pagingTpl', $this->config, 'AdvSearchPaging1');
         } elseif ($this->config['pagingType'] == 2) {
-            // &paging2Tpl [ chunk name | 'Paging2' ]
-            $paging2Tpl = $this->modx->getOption('paging2Tpl', $this->config, 'Paging2');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging2Tpl));
-            $this->config['paging2Tpl'] = (empty($chunk)) ? 'paging2' : $paging2Tpl;
+            // &pagingTpl [ chunk name | 'AdvSearchPaging2' ]
+            $this->config['pagingTpl'] = $this->modx->getOption('pagingTpl', $this->config, 'AdvSearchPaging2');
 
             // &currentPageTpl [ chunk name | 'CurrentPageLink' ]
-            $currentPageTpl = $this->modx->getOption('currentPageTpl', $this->config, 'CurrentPageLink');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $currentPageTpl));
-            $this->config['currentPageTpl'] = (empty($chunk)) ? 'currentpagelink' : $currentPageTpl;
+            $this->config['currentPageTpl'] = $this->modx->getOption('currentPageTpl', $this->config, 'AdvSearchCurrentPageLink');
 
             // &pageTpl [ chunk name | 'PageLink' ]
-            $pageTpl = $this->modx->getOption('pageTpl', $this->config, 'PageLink');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $pageTpl));
-            $this->config['pageTpl'] = (empty($chunk)) ? 'pagelink' : $pageTpl;
+            $this->config['pageTpl'] = $this->modx->getOption('pageTpl', $this->config, 'AdvSearchPageLink');
 
             // &pagingSeparator
             $this->config['pagingSeparator'] = $this->modx->getOption('pagingSeparator', $this->config, ' | ');
         } elseif ($this->config['pagingType'] == 3) {
-            // &paging3Tpl [ chunk name | 'Paging3' ]
-            $paging3Tpl = $this->modx->getOption('paging3Tpl', $this->config, 'Paging3');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging3Tpl));
-            $this->config['paging3Tpl'] = (empty($chunk)) ? 'paging3' : $paging3Tpl;
+            // &pagingTpl [ chunk name | 'AdvSearchPaging3' ]
+            $this->config['pagingTpl'] = $this->modx->getOption('pagingTpl', $this->config, 'AdvSearchPaging3');
 
             // &currentPageTpl [ chunk name | 'CurrentPageLink' ]
-            $currentPageTpl = $this->modx->getOption('paging3CurrentPageTpl', $this->config, 'CurrentPageLink');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $currentPageTpl));
-            $this->config['paging3CurrentPageTpl'] = (empty($chunk)) ? 'currentpagelink' : $currentPageTpl;
+            $this->config['currentPageTpl'] = $this->modx->getOption('currentPageTpl', $this->config, 'AdvSearchCurrentPageLink');
 
             // &pageTpl [ chunk name | 'PageLink' ]
-            $pageTpl = $this->modx->getOption('paging3PageLinkTpl', $this->config, 'PageLink');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $pageTpl));
-            $this->config['paging3PageLinkTpl'] = (empty($chunk)) ? 'pagelink' : $pageTpl;
+            $this->config['pageTpl'] = $this->modx->getOption('pageTpl', $this->config, 'AdvSearchPageLink');
 
             // &pagingSeparator
-            $this->config['paging3Separator'] = $this->modx->getOption('paging3Separator', $this->config, ' | ');
+            $this->config['pagingSeparator'] = $this->modx->getOption('pagingSeparator', $this->config, ' | ');
 
             // &pagingOuterRange
-            $this->config['paging3OuterRange'] = $this->modx->getOption('paging3OuterRange', $this->config, 2);
+            $outerRange = (int) $this->modx->getOption('paging3OuterRange', $this->config, 2);
+            $this->config['paging3OuterRange'] = ($outerRange > 0) ? $outerRange : 2;
 
             // &pagingMiddleRange
-            $this->config['paging3MiddleRange'] = $this->modx->getOption('paging3MiddleRange', $this->config, 3);
+            $middleRange = (int) $this->modx->getOption('paging3MiddleRange', $this->config, 3);
+            $this->config['paging3MiddleRange'] = ($middleRange > 0) ? $middleRange : 3;
 
             // &pagingRangeSplitter
-
-            $paging3RangeSplitter = $this->modx->getOption('paging3RangeSplitterTpl', $this->config, 'Paging3RangeSplitter');
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $paging3RangeSplitter));
-            $this->config['paging3RangeSplitterTpl'] = (empty($chunk)) ? 'paging3rangesplitter' : $paging3RangeSplitter;
+            $this->config['paging3RangeSplitterTpl'] = $this->modx->getOption('paging3RangeSplitterTpl', $this->config, '@INLINE <span class="advsea-page"> ... </span>');
         }
 
         if ($this->config['withAjax']) {
@@ -606,7 +595,7 @@ class AdvSearchResults extends AdvSearch {
             }
 
             $pagePh = $this->setPlaceholders($pagePh, $this->config['placeholderPrefix']);
-            $output = $this->processElementTags($this->parseTpl($this->config['paging1Tpl'], $pagePh));
+            $output = $this->processElementTags($this->parseTpl($this->config['pagingTpl'], $pagePh));
         } elseif ($this->config['pagingType'] == 2) {
             // pagination type 2
             $paging2 = array();
@@ -629,7 +618,7 @@ class AdvSearchResults extends AdvSearch {
             }
             $paging2 = @implode($this->config['pagingSeparator'], $paging2);
             $phs = $this->setPlaceholders(array('paging2' => $paging2), $this->config['placeholderPrefix']);
-            $output = $this->processElementTags($this->parseTpl($this->config['paging2Tpl'], $phs));
+            $output = $this->processElementTags($this->parseTpl($this->config['pagingTpl'], $phs));
         } elseif ($this->config['pagingType'] == 3) {
             // pagination type 3
             $paging3 = array();
@@ -686,13 +675,13 @@ class AdvSearchResults extends AdvSearch {
                 }
             } // for ($i = 1; $i <= $nbPages; ++$i)
 
-            $paging3 = @implode($this->config['paging3Separator'], $paging3);
+            $paging3 = @implode($this->config['pagingSeparator'], $paging3);
             $phs = $this->setPlaceholders(array(
                 'previouslink' => $previouslink,
                 'paging3' => $paging3,
                 'nextlink' => $nextlink,
                 ), $this->config['placeholderPrefix']);
-            $output = $this->processElementTags($this->parseTpl($this->config['paging3Tpl'], $phs));
+            $output = $this->processElementTags($this->parseTpl($this->config['pagingTpl'], $phs));
         }
         return $output;
     }
@@ -700,20 +689,20 @@ class AdvSearchResults extends AdvSearch {
     private function _formatPaging3($idx, $docId, $parameters = array()) {
         $pagePh = array();
         $pagePh['text'] = $idx;
-        $pagePh['separator'] = $this->config['paging3Separator'];
+        $pagePh['separator'] = $this->config['pagingSeparator'];
         $pagePh['page'] = $idx;
 
         if ($this->page == $idx) {
             $pagePh['link'] = $idx;
             $pagePh = $this->setPlaceholders($pagePh, $this->config['placeholderPrefix']);
-            $output = $this->processElementTags($this->parseTpl($this->config['paging3CurrentPageTpl'], $pagePh));
+            $output = $this->processElementTags($this->parseTpl($this->config['currentPageTpl'], $pagePh));
         } else {
             $parameters = array_merge($parameters, array(
                 $this->config['pageIndex'] => $idx
             ));
             $pagePh['link'] = $this->modx->makeUrl($docId, '', $parameters, $this->config['urlScheme']);
             $pagePh = $this->setPlaceholders($pagePh, $this->config['placeholderPrefix']);
-            $output = $this->processElementTags($this->parseTpl($this->config['paging3PageLinkTpl'], $pagePh));
+            $output = $this->processElementTags($this->parseTpl($this->config['pageTpl'], $pagePh));
         }
 
         return $output;

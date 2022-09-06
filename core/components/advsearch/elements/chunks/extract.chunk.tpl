@@ -1,1 +1,0 @@
-<span class="advsea-extract">[[+advsearch.extract]]</span> 

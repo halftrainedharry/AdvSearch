@@ -249,7 +249,7 @@ jQuery(function($) {
         } else {
             as.ld = $(as.ali).addClass('advsea-load-img').insertAfter(ref).hide(); // advsearch load img
         }
-        
+
         as.rw = $('#' + p + 'advsea-reswin').hide().removeClass('init'); // advsearch results window - hide window
 
         as.cl.unbind();  // detach existing function if any
@@ -475,7 +475,6 @@ jQuery(function($) {
                 as.nbr = parseInt(data.nbr);    // nb results
                 as.opc = parseFloat(data.opc);  // opacity
                 as.eff = data.eff;              // effect
-                as.cdf = data.cdf;              // clearDefault
 
                 as.rw.hide();
                 as.rw.html(html).css('opacity', as.opc).reswinDown(as.eff);

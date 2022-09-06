@@ -173,7 +173,7 @@ class AdvSearch {
         $this->config['urlScheme'] = $this->modx->getOption('urlScheme', $this->config, -1);
 
         // &hideLinks
-        $this->config['hideLinks'] = $this->modx->getOption('hideLinks', $this->config);
+        $this->config['hideLinks'] = $this->modx->getOption('hideLinks', $this->config, 0);
 
         return $this->config;
 
@@ -372,7 +372,7 @@ class AdvSearch {
             $chunk = $this->modx->getObject(modChunk::class, array('name' => $tplChunk), true);
             if (empty($chunk)) {
                 // try to use @splittingred's fallback
-                $f = $this->config['chunksPath'] . strtolower($tplChunk) . '.chunk.tpl';
+                $f = $this->config['chunksPath'] . $tplChunk . '.chunk.tpl';
                 try {
                     $output = $this->parseTplFile($f, $phs);
                 } catch (\Exception $e) {

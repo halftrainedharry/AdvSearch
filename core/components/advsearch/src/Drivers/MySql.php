@@ -40,10 +40,10 @@ class MySql extends Base {
         }
         // hideLinks
         if ($this->config['hideLinks']) {
-            $c->where(array(
-                'class_key:!=' => 'modSymLink',
-                'class_key:!=' => 'modWebLink',
-                    ), 'OR');
+            $c->where([
+                ['class_key:!=' => 'MODX\\Revolution\\modSymLink'],
+                ['class_key:!=' => 'MODX\\Revolution\\modWebLink'],
+            ]);
         }
 
         if (!empty($asContext['searchString'])) {

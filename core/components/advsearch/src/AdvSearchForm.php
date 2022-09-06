@@ -47,16 +47,6 @@ class AdvSearchForm extends AdvSearch {
         // initialize searchString
         $this->searchString = $this->_initSearchString();
 
-        //jQuery used by ajax mode
-        if ($this->config['withAjax']) {
-            // &addJQuery - [ 0 | 1 | 2 ]
-            $addJQuery = (int) $this->modx->getOption('addJQuery', $this->config, 1);
-            $this->config['addJQuery'] = ($addJQuery == 0 || $addJQuery == 1 || $addJQuery == 2) ? $addJQuery : 1;
-
-            // &jsJQuery - [ Location of the jQuery javascript library ]
-            $this->config['jsJQuery'] = $this->modx->getOption('jsJQuery', $this->config, $this->config['assetsUrl'] . 'js/jquery-1.10.2.min.js');
-        }
-
         // set up the search form
         // &resultsWindowTpl [ chunk name | 'ResultsWindow' ]
         $this->config['resultsWindowTpl'] = $this->modx->getOption('resultsWindowTpl', $this->config, 'ResultsWindow');
@@ -120,32 +110,22 @@ class AdvSearchForm extends AdvSearch {
             $this->modx->regClientCss($this->config['assetsUrl'] . 'css/advsearch.css' . $this->config['uncacheScripts']);
         }
 
-        // &clearDefault - [ 1 | 0 ]
-        $this->config['clearDefault'] = (bool) (int) $this->modx->getOption('clearDefault', $this->config, 0);
+        //jQuery used by ajax mode
+        if ($this->config['withAjax']) {
+            // &addJQuery - [ 0 | 1 | 2 ]
+            $addJQuery = (int) $this->modx->getOption('addJQuery', $this->config, 1);
+            $this->config['addJQuery'] = ($addJQuery == 0 || $addJQuery == 1 || $addJQuery == 2) ? $addJQuery : 1;
 
-        // include or not the jQuery library (required for clear default text, ajax mode)
-        if ($this->config['clearDefault'] || $this->config['withAjax']) {
+            // &jsJQuery - [ Location of the jQuery javascript library ]
+            $this->config['jsJQuery'] = $this->modx->getOption('jsJQuery', $this->config, $this->config['assetsUrl'] . 'js/jquery-1.10.2.min.js');
+
+            // include or not the jQuery library (required for clear default text, ajax mode)
             if ($this->config['addJQuery'] == 1) {
                 //regClientStartupHTMLBlock
                 $this->modx->regClientStartupHTMLBlock('<script>window.jQuery || document.write(\'<script src="' . $this->config['jsJQuery'] . '"><\/script>\');</script>');
             } elseif ($this->config['addJQuery'] == 2) {
                 $this->modx->regClientHTMLBlock('<script>window.jQuery || document.write(\'<script src="' . $this->config['jsJQuery'] . '"><\/script>\');</script>');
             }
-        }
-
-        if ($this->config['clearDefault']) {
-            $jsHeaderArray['asid'] = $this->config['asId'];
-            $jsHeaderArray['cdt'] = $this->modx->lexicon('advsearch.box_text');
-        }
-
-        // &jsSearchForm - [ url | $assetsUrl . 'js/advsearchform.min.js' ]
-        $this->config['jsSearchForm'] = $this->modx->getOption('jsSearchForm', $this->config, $this->config['assetsUrl'] . 'js/advsearchform.min.js');
-
-        // include or not the inputForm js script linked to the form
-        if ($this->config['addJs'] == 1) {
-            $this->modx->regClientStartupScript($this->config['jsSearchForm'] . $this->config['uncacheScripts']);
-        } elseif ($this->config['addJs'] == 2) {
-            $this->modx->regClientScript($this->config['jsSearchForm'] . $this->config['uncacheScripts']);
         }
 
         if ($this->config['withAjax']) {
@@ -180,6 +160,10 @@ class AdvSearchForm extends AdvSearch {
                     $this->modx->$addJs($this->config['jsPopulateForm']);
                 }
             }
+
+            // if ($this->config['clearDefault']) {
+                $jsHeaderArray['cdt'] = $this->modx->lexicon('advsearch.box_text');
+            // }
 
             // add ajaxResultsId, liveSearch mode and some other parameters in js header
             $jsHeaderArray['asid'] = $this->config['asId'];
