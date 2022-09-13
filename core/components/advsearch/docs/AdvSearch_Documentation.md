@@ -12,6 +12,7 @@
     - [Properties](#properties-2)
   - [Placeholders](#placeholders)
   - [Chunks](#chunks)
+    - [AdvSearchExtract](#advsearchextract)
     - [AdvSearchForm](#advsearchform-1)
     - [AdvSearchResultsWindow](#advsearchresultswindow)
     - [AdvSearchResult](#advsearchresult)
@@ -39,26 +40,32 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: 'as2'. a-z, _ , 0-9 (case sensitive) | as0 |
-| addCss | to add the default css file to the web pages automatically. 0: not included. You should add the css manually. 1: included before the closing HEAD tag | 1 |
-| addJs | to add the javascript files to the web pages automatically. 0: not included. You should add them manually. 1: included before the closing HEAD tag 2: included before the closing BODY tag| 1 |
-| landing | the resource id that the AdvSearch snippet is called on, that will display the results of the search. Mandatory if you would like display the results on another page. | 0 => current document id |
-| method | whether to send the search over POST or GET. 'POST' | 'GET' | GET |
-| searchIndex | the name of the REQUEST parameter that the search will use. | search |
-| searchString | to initialize the search with a default searchString. Used in conjunction with ``&init=`all` `` this allow to display search results for a specific search string. | '' => empty string |
-| toPlaceholder | whether to set the output to directly return, or set to a placeholder with this propertys name. placeholder name | '' (empty string) => directly returned |
-| tpl | the chunk that will be used to display the search form. | AdvSearchForm |
+| asId | Unique id for AdvSearch instance. Used to distinguish between several AdvSearch instances on the same page. This token is used to link the snippet calls between them. Choose a short name. E.g. 'as2'. a-z, _ , 0-9 (case sensitive) | as0 |
+| tpl | The chunk that will be used to display the search form. Available placeholders: `[[+resultsWindow]]` => markup to display the search result with AJAX mode. | AdvSearchForm |
+| addCss | Whether to add the default CSS file (advsearch.css) to the web pages automatically. 0 => Not included. You should add the CSS manually; 1 => Included before the closing HEAD tag | 1 |
+| landing | The resource id where the AdvSearch snippet is called on to display the search results. Specify it if you like to display the results on another page. | 0 => current document id |
+| method | Whether to send the search over POST or GET. Options: 'POST', 'GET' | GET |
+| searchParam | The name of the REQUEST parameter for the search value. Has to be set to the same value for the snippets "AdvSearchForm" and "AdvSearch" | search |
+| pageParam | The name of the REQUEST parameter for the page. (For AJAX mode it has to be set for this snippet as well.) | page |
+| searchString | To initialize the search with a default searchString. Used in conjunction with ``&init=`all` `` this allows to display search results for a specific search string. | |
+| toPlaceholder | Whether to return the output directly, or set it to a placeholder with this property's name. | |
+| urlScheme | Indicates in what format the URL is generated. Options: -1, 0, 1, full, abs, http, https | -1 |
+| uncacheScripts | Add the time to the CSS and JS files so that the browser won't use a cached version. | 1 |
 
 ### Ajax mode Properties
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
 | withAjax | whether to set on a new document (page reload), or set the results in div section thru ajax. | 0 => non-ajax mode |
-| ajaxResultsId | The resource id which hold the AdvSearch snippet call. This document is called through ajax. It should be a plain/text document with empty template. Mandatory with the ajax mode | |
-| addJQuery | to add the jquery library to the web pages automatically. 0: not included; 1: included before the closing HEAD tag; 2: included before the closing BODY tag | 1 |
-| jsJQuery | Location of the Jquery javascript library. path to the Jquery library. change this parameter to set an newer jquery release. | assets/components/advsearch/js/jquery-1.5.1.min.js |
+| ajaxResultsId | The resource id which holds the AdvSearch snippet call. This document is called through AJAX. It should be a plain/text document with empty template. This property is mandatory with the ajax mode. | 0 |
+| addJs | Whether to add the javascript files to the web pages automatically. 0 => not included. You should add them manually; 1 => Included before the closing HEAD tag; 2 => Included before the closing BODY tag. | 1 |
+| addJQuery | Whether to add the jQuery library to the page automatically. 0 => Not included; 1 => Included before the closing HEAD tag; 2 => Included before the closing BODY tag | 1 |
+| jsJQuery | Location of the jQuery javascript library. Change this parameter to use a newer jQuery version. The placeholder `{assets_url}` can be used. | assets/components/advsearch/js/jquery-1.10.2.min.js |
+| jsSearch | Location of the a javascript file, that does the AJAX calls and handles the response. The placeholder `{assets_url}` can be used. | assets/components/advsearch/js/advsearch.min.js |
+| resultsWindowTpl | Chunk for the markup where the search results are displayed. Available placeholder in the chunk: `[[+asId]]`. | AdvSearchResultsWindow |
 | liveSearch | to use the live search (i.e. results as typing) | 0 |
-| urlScheme | indicates in what format the URL is generated. Options: -1, full, abs, http, https | | -1
+| effect | The effect to apply for the displaying of the window of results. Options: basic, showfade, slidefade | basic |
+| opacity | Opacity of the advSearch_output div where are returned the ajax results. Options: 0. (transparent) < Float < 1. (opaque) | 1 |
 
 ### Google Maps Properties
 
@@ -85,14 +92,14 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| asId | Unique id for AdvSearch instance. Used to distinguish several AdvSearch add-on instances on the same page. This token is used to link the snippet calls between them. Choose a short name. eg: 'as2'. a-z, _ , 0-9 (case sensitive) | as0 |
-| tpl | The chunk that will be used to display the contents of each search result. | AdvSearchResult |
-| containerTpl | the chunk that will be used to wrap all the search results, pagination and message. | AdvSearchResults |
-| fields | The list of fields available with search results. comma separated list of fields | pagetitle,longtitle,alias,description,introtext,content |
-| withFields | Define which fields are used for the search in fields of document resource. Comma separated list of fields from modResource. e.g: `pagetitle,introtext` : the search occurs only inside these 2 fields | pagetitle,longtitle,alias,description,introtext,content |
-| includeTVs | Add TVs values to search results and set them as placeholders. Comma separated list of tv names | |
-| withTvs | Define which Tvs are used for the search in Tvs. Comma separated list of tv names. e.g: `tv1,tv2,tv3` : the search occurs only inside these 3 TVs. | |
-| sortby | comma separated list of couple "field [ASC|DESC]" to sort by. field could be : field name or TV name. Field name of joined resource are prefixed by resource name. e.g: equipComment_body | createdon DESC |
+| asId | Unique id for AdvSearch instance. Used to distinguish between several AdvSearch instances on the same page. This token is used to link the snippet calls between them. Choose a short name. E.g. 'as2'. a-z, _ , 0-9 (case sensitive) | as0 |
+| tpl | The chunk that is used to display the content of each search result. | AdvSearchResult |
+| containerTpl | The chunk that is used to wrap all the search results, pagination and message. | AdvSearchResults |
+| fields | The comma separated list of fields available with search results. | pagetitle,longtitle,alias,description,introtext,content |
+| withFields | A comma separated list of fields where to do the search. Define which fields are used for the search in fields of document resource. Comma separated list of fields from modResource. e.g: `pagetitle,introtext` : the search occurs only inside these 2 fields | pagetitle,longtitle,alias,description,introtext,content |
+| includeTVs | A comma separated list of TV names to include in the result. Their values are made available as placeholders in the template chunk. | |
+| withTvs | A comma separated list of TV names where to do the search. TV values are added as results. e.g: `tv1,tv2,tv3` => the search occurs only inside these 3 TVs. | |
+| sortby | Comma-separated list of couple "field [ASC|DESC]" to sort by. Field could be field name or TV name (only if set in `&withTVs`). Field name of joined resource are prefixed by resource name. e.g: equipComment_body | id DESC |
 | **Limit resources to search in** | | |
 | ids | A comma-separated list of IDs to restrict the search to. Use  the *GetIds* addon to specify a complex list of ids. | |
 | parents | A comma-separated list of parent IDs to restrict the search to the direct children of these particular containers. | |
@@ -101,28 +108,29 @@ Basic usage:
 | hideMenu | Whether or not to search in documents that are hidden from the menu. 0 => Search only in documents visible from menu;· 1 => Search only in documents hidden from menu;· 2 => Search in both | 2 |
 | hideLinks | Exclude Symlinks and Weblinks from the search | 0 |
 | **Output** | | |
-| output | output type. Opt: 'html', 'json'. 'json' : Array of all results as json string. 'html' : Page of results as html string | html |
-| toPlaceholder | whether to set the output to directly return, or set to a placeholder with this propertys name. | '' (empty string) => directly returned |
+| output | Comma-separated list of output types. Options: 'html', 'json', 'ids'. 'json' => Array of all results as JSON; 'html' => Page of results as html markup; 'ids' => The ids of the current page as a JSON array. Multiple output types are json encoded | html |
+| toPlaceholder | Whether to return the output directly, or set it to a placeholder with this property's name. | |
+| placeholderPrefix | Prefix of global placeholders. | advsearch |
+| toArray | Output raw search results and configuration for debugging purposes | 0 |
 | **Hooks** | | |
 | queryHook | A query hook to change the default query. A snippet name to run as queryHook. See the [QueryHook documentation](QueryHooks_Documentation.md). | |
 | postHook | A post hook to change the displaying of results. A snippet name to run as postHook. e.g: To display the results as a table rather than as a list use the posthook feature. | |
 | postHookTpls | A comma separated list of chunks used by the postHook to change the display of results. e.g: To display the results as a table of results, you probably provide: the table header chunk and the row header chunk. | |
-| **Request method and parameter Names** | | |
-| method | whether to send the search over POST or GET. Options: 'POST', 'GET' | GET |
-| searchIndex | the name of the REQUEST parameter that the search will use. | search |
-| pageIndex | | |
-| offsetIndex | The name of the offset parameter that the search will use. | offset |
+| **Request parameter Names** | | |
+| searchParam | The name of the REQUEST parameter for the search value. | search |
+| pageParam | The name of the REQUEST parameter for the page. | page |
 | **Cache** | | |
 | cacheQuery | Whether or not to cache the query | 0 |
 | cacheTime | How long the query should be cached in seconds | 7200 (= 2 hours) |
 | **Other settings** | | |
-| maxWords | maximum number of words for searching | 20 |
-| minChars | Minimum number of characters to require for a word to be valid for searching. 2 < int < 100 | 2 |
-| init | defines if the search display all the results or none when the page is loaded at the first time. Options: 'none', 'all' | none |
-| engine | Search engine selected | MySql |
-| fieldPotency | potency per field. comma separated list of field : potency. Default potency to 1 if not set | createdon |
-| searchString | to initialize the search with a default searchString. Used in conjunction with `&init=`all` ``. this allow to display search results for a specific search string. | |
-| urlScheme | indicates in what format the URL is generated. Options: -1, full, abs, http, https | -1 => URL is relative to site_url |
+| maxWords | Maximum number of words for searching. 1 <= int <= 30 | 20 |
+| minChars | Minimum number of characters to require for a word to be valid for searching. 2 <= int <= 10 | 3 |
+| init | Defines if the search display all the results or none when the page is loaded at the first time. Options: 'none', 'all' | none |
+| engine | The Search engine that is used. Currently only 'MySql' is available | MySql |
+| driverClass | Class name of a custom driver | MySql |
+| searchString | To initialize the search with a default searchString. Used in conjunction with ``&init=`all` ``. This allows to display search results for a specific search string. | |
+| urlScheme | Indicates in what format the URL is generated. Options: -1, 0, 1, full, abs, http, https | -1 => URL is relative to site_url |
+| debug | Output debug information (about the query etc.) to the page (or the error log in AJAX mode) | 0 |
 
 ### Paging Properties
 
@@ -142,22 +150,20 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| showExtract | show the search terms highlighted in one or several extract. string as nb: csv list of fields. 5 stands for 5:content. e.g: 3: introtext,content => 3 extracts displayed from introtext . content | '1:content' => One extract displayed from content field |
-| extractTpl | The chunk that will be used to wrap each extract | Extract |
-| extractEllipsis | ellipside to mark the start and the end of an extract when the sentence is cutting | '...' (three dots) |
-| extractLength | length of separate extraction. 50 < Integer < 800 | 200 |
-| highlightResults | create links so that search terms will be highlighted when linked page clicked. Requires Highlight plugin | 1 |
-| highlightClass | The CSS class name to add to highlighted terms in results. | advsea-highlight |
-| highlightTag | The html tag to wrap the highlighted term with in search results. | span |
+| showExtract | Show the search terms highlighted in one or several extracts. The format is "n : comma separated list of fields where to search terms to highlight". n => Maximum number of extracts displayed for each search result. The search term is searched in the concatenated fields. 5 stands for 5:content. e.g: 3: introtext,content => 3 extracts displayed from introtext . content | '1:content' => One extract displayed from the content field |
+| extractLength | The number of characters for the content extraction of each search result. length of separate extraction. 50 < Integer < 800 | 200 |
+| extractTpl | The chunk that will be used to wrap each extract. | AdvSearchExtract |
+| extractEllipsis | The string used to mark the start and the end of an extract. | '...' (three dots) |
+| highlightResults | Whether or not to highlight the search terms in the extracts. | 1 |
+| highlightClass | The CSS class name to add to highlighted terms in the extracts. | advsea-highlight |
+| highlightTag | The HTML tag to wrap the highlighted term with in the extracts. | span |
 
 ### Ajax mode Properties
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| effect | The effect to apply for the displaying of the window of results. See AdvSearch demo site. Options: Opt: basic, showfade, slidefade | basic |
-| opacity | Opacity of the advSearch_output div where are returned the ajax results. Options: 0. (transparent) < Float < 1. (opaque) | 1 |
 | moreResults | The resource id of the page you want the more results link to point to. Mandatory if you want more results. | 0 => no moreResults page |
-| moreResultsTpl | The chunk name to use for the “More results” link. | PageLink |
+| moreResultsTpl | The chunk name to use for the "More results" link. | AdvSearchMoreResults |
 | withAjax | whether to set on a new document (page reload), or set the results in div section thru ajax. Should be set to 1 with ajax mode. | 0 => non-ajax mode |
 
 ## AdvSearchGmapInfoWindow
@@ -190,7 +196,7 @@ Landing resource document id where are displayed results with non-ajax mode.
 **[[+method]]**<br>
 http request method used to send the form.
 
-**[[+searchIndex]]**<br>
+**[[+searchParam]]**<br>
 http variable name used for the search string.
 
 **[[+searchValue]]**<br>
@@ -229,9 +235,6 @@ The total number of result pages.
 **[[+perPage]]**<br>
 The maximum number of results per page.
 
-**[[+offset]]**<br>
-Offset of the current page.
-
 **[[+first]]**<br>
 Number of the first result of the current page.
 
@@ -245,6 +248,13 @@ String used as separator between page link number for paging Type2.
 liveSearch Boolean [0/1].
 
 ## Chunks
+
+### AdvSearchExtract
+
+Default chunk that will be used to wrap each extract.
+
+Placeholders:
+* `[[+extract]]` => The text of the extract
 
 ### AdvSearchForm
 
@@ -313,9 +323,6 @@ Search results are displayed in the current page through AJAX request.
 **Non ajax mode**<br>
 Search results are displayed in a new page (page reloading).
 
-**Search engine**<br>
-AdvSearch could runs with two different engine: mysql and zend+mysql. Zend engine allows to do a search in an index repository first before to get the results from the mysql database. This needs to index documents first. For performance reasons, this engine should be reserved for search in dynamic contents.
-
 **Search in dynamic contents**<br>
 Mysql database store only static contents. If a document has one or several MODx tags (chunk, tvs, snippet calls …) the parsed results are not stored in the database. To do a search in parsed resources, the parsed documents' should be first processed and search terms found in these documents stored in an additional repository (a folder). Then this repository is used in
 conjunction with MySQL to provide search results.
@@ -349,4 +356,4 @@ Search with filters based on document fields and Tvs. By using the appropriate s
 
 **Search in custom packages**<br>
 By default advSearch runs with the modResource package (documents + possibly template variables)<br>
-By using the “Main” and “Joined” declarations of the queryHook, you could add joined resources to the modResource package or replace modResource by an another package (+ possibly joined resources). See the query hook documentation for futher information.
+By using the "Main" and "Joined" declarations of the queryHook, you could add joined resources to the modResource package or replace modResource by an another package (+ possibly joined resources). See the query hook documentation for futher information.

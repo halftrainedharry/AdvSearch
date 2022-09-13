@@ -1,4 +1,5 @@
 <?php
+use xPDO\xPDO;
 use AdvSearch\AdvSearchRequest;
 /**
  * AdvSearch
@@ -18,19 +19,12 @@ use AdvSearch\AdvSearchRequest;
  *
  * -----------------------------------------------------------------------------
  */
-$scriptProperties['fields'] = $modx->getOption('fields', $scriptProperties, 'pagetitle,longtitle,alias,description,introtext,content');
-
-// The first time display or not results
-$asId = filter_input(INPUT_GET, 'asId', FILTER_SANITIZE_SPECIAL_CHARS);
-$sub = filter_input(INPUT_GET, 'sub', FILTER_SANITIZE_SPECIAL_CHARS);
-$init = (!empty($asId) || !empty($sub)) ? 'all' : $scriptProperties['init'];
-if ($init !== 'all') {
-    return;
+try {
+    $searchRequest = new AdvSearchRequest($modx, $scriptProperties);
+    $output = $searchRequest->output();
+    return $output;
 }
-
-$as = $modx->getOption('asId', $scriptProperties, 'as0') ? $scriptProperties['asId'] : 'as0';
-$as = str_replace(' ', '', $as);
-
-$searchRequest = new AdvSearchRequest($modx, $scriptProperties);
-$output = $searchRequest->output();
-return $output;
+catch (\Exception $e) {
+    $modx->log(xPDO::LOG_LEVEL_ERROR, $e->getMessage());
+}
+return '';

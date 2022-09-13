@@ -15,22 +15,28 @@ class Custom extends Base {
         }
         $main = $asContext['queryHook']['main'];
         $this->mainClass = $main['class'];  // main class
-        $main['packagePath'] = $this->replacePropPhs($main['packagePath']);
-        $tablePrefix = isset($main['tablePrefix']) ? $main['tablePrefix'] : '';
-        $this->modx->addPackage($main['package'], $main['packagePath'], $tablePrefix); // add package
+
+        if (!class_exists($this->mainClass)) {
+            $main['packagePath'] = $this->replacePropPhs($main['packagePath']);
+            $tablePrefix = isset($main['tablePrefix']) ? $main['tablePrefix'] : '';
+            $this->modx->addPackage($main['package'], $main['packagePath'], $tablePrefix); // add package
+        }
+
         $this->primaryKey = $this->modx->getPK($this->mainClass); // get primary key
 
+        $shortMainClass = end(explode('\\', $this->mainClass));
+
         // set query from main package
-        $c = $this->modx->newQuery($main['class']);
+        $c = $this->modx->newQuery($this->mainClass);
         // add joined resources
         $c = $this->addJoinedResources($c, $asContext);
-        $fields = array_merge((array) $main['mainFields'], (array)$main['joinedFields']);
+        $fields = array_merge((array) $asContext['mainFields'], (array)$asContext['joinedFields']);
         if (!in_array('id', $fields)) {
             $fields = array_merge(array('id'), $fields);
         }
         // initialize and add main displayed fields
         $c->distinct();
-        $c->select($this->modx->getSelectColumns($main['class'], $main['class'], '', $fields));
+        $c->select($this->modx->getSelectColumns($this->mainClass, $shortMainClass, '', $fields));
 
         // restrict search to specific keys ($lstIds)
         if (!empty($this->config['ids'])) {
@@ -64,14 +70,14 @@ class Custom extends Base {
         }
 
         // debug mysql query
-        if ($this->dbg) {
+        if ($this->debug) {
             $this->modx->log(modX::LOG_LEVEL_DEBUG, 'SearchString: ' . $this->searchString, '', '_customSearch');
             $this->modx->log(modX::LOG_LEVEL_DEBUG, 'Select before pagination: ' . $this->niceQuery($c), '', '_customSearch');
         }
 
         // get number of results before pagination
-        $this->resultsCount = $this->getQueryCount($main['class'], $c);
-        if ($this->dbg) {
+        $this->resultsCount = $this->getQueryCount($this->mainClass, $c);
+        if ($this->debug) {
             $this->modx->log(modX::LOG_LEVEL_DEBUG, 'Number of results before pagination: ' . $this->resultsCount, '', '_customSearch');
         }
 
@@ -81,12 +87,12 @@ class Custom extends Base {
             $c->limit($limit, $this->offset);
 
             // debug mysql query
-            if ($this->dbg) {
+            if ($this->debug) {
                 $this->modx->log(modX::LOG_LEVEL_DEBUG, 'Final select: ' . $this->niceQuery($c), '', '_customSearch');
             }
 
             //============================= get results
-            $collection = $this->modx->getCollection($main['class'], $c);
+            $collection = $this->modx->getCollection($this->mainClass, $c);
             if (!empty($collection)) {
                 foreach ($collection as $resource) {
                     $pkValue = $resource->get($this->primaryKey);
@@ -96,7 +102,7 @@ class Custom extends Base {
             }
         }
 
-        if ($this->dbg) {
+        if ($this->debug) {
             $this->modx->log(modX::LOG_LEVEL_DEBUG, "lstIdsResults:" . @implode(',', $this->idResults), '', '_customSearch');
         }
 

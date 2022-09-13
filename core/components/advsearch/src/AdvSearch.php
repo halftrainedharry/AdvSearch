@@ -24,11 +24,10 @@ class AdvSearch {
 
     public $modx;
     public $config = array();
-    protected $searchString = '';
-    protected $searchQuery = null;
+    protected $searchString = ''; //raw search string
     protected $searchTerms = array();
     protected $tstart;
-    protected $dbg = false;
+    protected $debug = false;
     /**
      * To hold error message
      * @var string
@@ -39,7 +38,7 @@ class AdvSearch {
      * To hold placeholder array, flatten array with prefix
      * @var array
      */
-    private $_placeholders = array();
+    // private $_placeholders = array();
     /**
      * store the chunk's HTML to property to save memory of loop rendering
      * @var array
@@ -61,14 +60,14 @@ class AdvSearch {
             error_reporting(E_ALL);
             ini_set('display_error', true);
             if ($config['withAjax']) {
-                $this->_placeholders['debug'] = array();
+                // $this->_placeholders['debug'] = array();
                 $this->modx->setLogTarget('FILE');
             } else {
                 $this->modx->setLogTarget('HTML');
             }
             $this->modx->setLogLevel(modX::LOG_LEVEL_DEBUG);
         }
-        $this->dbg = ($config['debug'] > 0);
+        $this->debug = ($config['debug'] > 0);
 
         // charset [ charset | 'UTF-8' ]
         $config['charset'] = $this->modx->config['modx_charset'];
@@ -114,7 +113,7 @@ class AdvSearch {
             "MySql version" => $this->getMysqlVersion(),
             "AdvSearch version" => self::VERSION . ' ' . self::RELEASE,
         );
-        if ($this->dbg) {
+        if ($this->debug) {
             $this->modx->log(modX::LOG_LEVEL_DEBUG, '[AdvSearch] System environment: ' . print_r($systemInfo, true), '', __METHOD__);
             $this->modx->log(modX::LOG_LEVEL_DEBUG, '[AdvSearch] Config parameters before checking: ' . print_r($this->config, true), '', __METHOD__);
         }
@@ -126,28 +125,27 @@ class AdvSearch {
         $this->config['method'] = strtolower($this->modx->getOption('method', $this->config, 'get'));
 
         // &init  [ 'none' | 'all' ]
-        $init = $this->modx->getOption('init', $this->config, 'none');
+        $init = strtolower($this->modx->getOption('init', $this->config, 'none'));
         $this->config['init'] = ($init === 'all') ? 'all' : 'none';
 
         // &libraryPath [ path | '{core_path}components/advsearch/libraries/' ]
         $path = $this->modx->getOption('libraryPath', $this->config, $this->modx->getOption('advsearch.core_path', null, $this->modx->getOption('core_path') . 'components/advsearch/') . 'libraries/');
         $this->config['libraryPath'] = $this->replacePropPhs($path);
 
-        /* deprecated @2.0.0 */
-        // &offsetIndex [ string | 'offset' ] : The name of the REQUEST parameter to use for the pagination offset
-        $this->config['offsetIndex'] = $this->modx->getOption('offsetIndex', $this->config, 'offset');
-
-        // &pageIndex [ string | 'page' ] : The name of the REQUEST parameter to use for the pagination page
-        $this->config['pageIndex'] = $this->modx->getOption('pageIndex', $this->config, 'page');
+        // &pageParam [ string | 'page' ] : The name of the REQUEST parameter to use for the pagination page
+        $this->config['pageParam'] = trim($this->modx->getOption('pageParam', $this->config, 'page'));
 
         // &output [ 'json' | 'html' | 'ids' | comma separated outputs ]
-        $this->config['output'] = $this->modx->getOption('output', $this->config, 'html');
-        if (empty($this->config['output'])) {
-            $this->config['output'] = 'html';
+        $outputLst = strtolower($this->modx->getOption('output', $this->config, 'html'));
+        $output = array_map('trim', explode(',', $outputLst));
+        $output = array_intersect($output, ['html', 'json', 'ids']);
+        if (!count($output)) {
+            $output = ['html'];
         }
+        $this->config['output'] = $output;       
 
-        // &searchIndex [ string | 'search' ]
-        $this->config['searchIndex'] = $this->modx->getOption('searchIndex', $this->config, 'search');
+        // &searchParam [ string | 'search' ]
+        $this->config['searchParam'] = trim($this->modx->getOption('searchParam', $this->config, 'search'));
 
         // searchString [ string | '' ]
         $this->config['searchString'] = $this->modx->getOption('searchString', $this->config, '');
@@ -155,7 +153,7 @@ class AdvSearch {
         // &toPlaceholder [ string | '' ]
         $this->config['toPlaceholder'] = $this->modx->getOption('toPlaceholder', $this->config, '');
 
-        // &placeholderPrefix [ string | '' ]
+        // &placeholderPrefix [ string | 'advsearch' ]
         $this->config['placeholderPrefix'] = $this->modx->getOption('placeholderPrefix', $this->config, 'advsearch');
 
         // &addCss - [ 0 | 1 ]
@@ -220,25 +218,29 @@ class AdvSearch {
         return @implode("\n", $this->_error);
     }
 
+    public function hasError() {
+        return count($this->_error) > 0;
+    }
+
     /**
      * Set internal placeholder
      * @param   string  $key    key
      * @param   string  $value  value
      * @param   string  $prefix add prefix if it's required
      */
-    public function setPlaceholder($key, $value, $prefix = '') {
-        $prefix = !empty($prefix) ? $prefix : (isset($this->config['phsPrefix']) ? $this->config['phsPrefix'] : '');
-        $this->_placeholders[$prefix . $key] = $this->trimString($value);
-    }
+    // public function setPlaceholder($key, $value, $prefix = '') {
+    //     // $prefix = !empty($prefix) ? $prefix : (isset($this->config['phsPrefix']) ? $this->config['phsPrefix'] : '');
+    //     $this->_placeholders[$prefix . $key] = $this->trimString($value);
+    // }
 
     /**
      * Get an internal placeholder
      * @param   string  $key    key
      * @return  string  value
      */
-    public function getPlaceholder($key) {
-        return $this->_placeholders[$key];
-    }
+    // public function getPlaceholder($key) {
+    //     return $this->_placeholders[$key];
+    // }
 
     /**
      * Set internal placeholders
@@ -248,17 +250,17 @@ class AdvSearch {
      * @param   string  $delimiter      define placeholder's delimiter
      * @return  mixed   boolean|array of placeholders
      */
-    public function setPlaceholders($placeholders, $prefix = '', $merge = true, $delimiter = '.') {
+    public function cleanPlaceholders($placeholders, $prefix = '', $merge = true, $delimiter = '.') {
         if (empty($placeholders)) {
-            return FALSE;
+            return false;
         }
-        $prefix = !empty($prefix) ? $prefix : (isset($this->config['phsPrefix']) ? $this->config['phsPrefix'] : '');
+        // $prefix = !empty($prefix) ? $prefix : (isset($this->config['phsPrefix']) ? $this->config['phsPrefix'] : '');
         $placeholders = $this->trimArray($placeholders);
-        $placeholders = $this->implodePhs($placeholders, rtrim($prefix, $delimiter));
+        // $placeholders = $this->implodePhs($placeholders, rtrim($prefix, $delimiter));
         // enclosed private scope
-        if ($merge) {
-            $this->_placeholders = array_merge($this->_placeholders, $placeholders);
-        }
+        // if ($merge) {
+        //     $this->_placeholders = array_merge($this->_placeholders, $placeholders);
+        // }
         // return only for this scope
         return $placeholders;
     }
@@ -267,9 +269,9 @@ class AdvSearch {
      * Get internal placeholders in an associative array
      * @return array
      */
-    public function getPlaceholders() {
-        return $this->_placeholders;
-    }
+    // public function getPlaceholders() {
+    //     return $this->_placeholders;
+    // }
 
     /**
      * Merge multi dimensional associative arrays with separator
@@ -682,7 +684,7 @@ class AdvSearch {
 
             return true;
         } else {
-            if (strlen($term) < $this->config['minChars']) {
+            if (mb_strlen($term) < $this->config['minChars']) {
                 $msgerr = $this->modx->lexicon('advsearch.minchars', array(
                     'minterm' => $term,
                     'minchars' => $this->config['minChars']
@@ -692,18 +694,18 @@ class AdvSearch {
                 return false;
             }
             $nbTerms++;
-            if ($nbTerms > $this->config['maxWords']) {
-                $msgerr = $this->modx->lexicon('advsearch.maxwords', array(
-                    'maxwords' => $this->config['maxwords']
-                ));
-                $this->setError($msgerr);
+            // if ($nbTerms > $this->config['maxWords']) {
+            //     $msgerr = $this->modx->lexicon('advsearch.maxwords', array(
+            //         'maxwords' => $this->config['maxwords']
+            //     ));
+            //     $this->setError($msgerr);
 
-                return false;
-            }
+            //     return false;
+            // }
             // record the valid search terms for futher highlighting
-            if ($record && ($sign || is_null($sign))) {
-                $this->searchTerms[] = $term;
-            }
+            // if ($record && ($sign || is_null($sign))) {
+            //     $this->searchTerms[] = $term;
+            // }
 
             return true;
         }
@@ -718,12 +720,10 @@ class AdvSearch {
      * @param   string  $tag            The html tag name to use to wrap the term found
      * @return  string  Returns highlighted string
      */
-    public function addHighlighting($string, array $searchTerms = array(), $class = 'advsea-highlight', $tag = 'span', $rank = null) {
+    public function addHighlighting($string, array $searchTerms = array(), $class = 'advsea-highlight', $tag = 'span', $rank_init = null) {
         foreach ($searchTerms as $key => $value) {
             $pattern = preg_quote($value, '/');
-            if (empty($rank)) {
-                $rank = ($key + 1);
-            }
+            $rank = empty($rank_init) ? ($key + 1) : $rank_init;
             $string = preg_replace('/(\s*)(' . $pattern . ')(\s*)/i', '<' . $tag . ' class="' . $class . ' ' . $class . '-' . $rank . '">$0</' . $tag . '>', $string);
         }
 

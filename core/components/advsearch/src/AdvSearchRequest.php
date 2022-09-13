@@ -21,8 +21,6 @@ use AdvSearch\AdvSearchResults;
 class AdvSearchRequest extends AdvSearch {
 
     public $searchResults = null;
-    /* deprecated since 2.0.0 */
-    protected $offset = 0;
     protected $page = 1;
     protected $queryHook = null;
     protected $displayedFields = array();
@@ -42,15 +40,15 @@ class AdvSearchRequest extends AdvSearch {
      */
     public function output() {
         if (!$this->forThisInstance()) {
-            return false;
+            return '';
         }
 
-        // The first time display or not results, duplicating snippet's validation
-        $asId = filter_input(INPUT_GET, 'asId', FILTER_SANITIZE_SPECIAL_CHARS);
-        $sub = filter_input(INPUT_GET, 'sub', FILTER_SANITIZE_SPECIAL_CHARS);
+        // The first time display or not results
+        $asId = $_REQUEST['asId'] ?? '';
+        $sub = $_REQUEST['sub'] ?? '';
         $init = (!empty($asId) || !empty($sub)) ? 'all' : $this->config['init'];
         if ($init !== 'all') {
-            return;
+            return '';
         }
 
         // &cacheQuery [ 0 | 1 ]
@@ -85,25 +83,11 @@ class AdvSearchRequest extends AdvSearch {
         $postHookTpls = (!empty($postHookTplsLst)) ? array_map('trim', explode(',', $postHookTplsLst)) : array();
         $this->config['postHookTpls'] = implode(',', $postHookTpls);
 
-        // ajax mode parameters
-        if ($this->config['withAjax']) {
-            // &opacity - [ 0. < float <= 1. ]  Should be a float value
-            $opacity = floatval($this->modx->getOption('opacity', $this->config, 1.));
-            $this->config['opacity'] = ($opacity > 0. && $opacity <= 1.) ? $opacity : 1.0;
-
-            // &effect - [ 'basic' | 'showfade' | 'slidefade' ]
-            $this->config['effect'] = $this->modx->getOption('effect', $this->config, 'basic');
-        }
-
         $this->_initSearchString();
 
         // initialise page of results
-        $page = filter_input(INPUT_GET, $this->config['pageIndex'], FILTER_SANITIZE_NUMBER_INT);
-        if (!empty($page)) {
-            $this->page = intval($page) > 0 ? intval($page) : 1;
-        } else {
-            $this->page = 1;
-        }
+        $page = (int) $_REQUEST[$this->config['pageParam']] ?? 0; //filter_input(INPUT_GET, $this->config['pageParam'], FILTER_SANITIZE_NUMBER_INT);
+        $this->page = $page ?: 1;
 
         $queryHook = $this->getHooks('queryHook');
         if (isset($queryHook['perPage']) && !empty($queryHook['perPage'])) {
@@ -111,18 +95,23 @@ class AdvSearchRequest extends AdvSearch {
         }
         $asContext = array(
             'searchString' => $this->searchString,
-            'searchQuery' => $this->searchQuery,
             'searchTerms' => $this->searchTerms,
-            'offset' => $this->offset,
             'page' => $this->page,
             'queryHook' => $queryHook
         );
 
+        $doQuery = true;
+        // Abort if there are errors
+        if ($this->hasError()){
+            $output = $this->getError();
+            $outputCount = 0;
+            $doQuery = false;
+        }
+
         /**
          * Start the searching from here
          */
-        $doQuery = true;
-        if ($this->config['cacheQuery']) {
+        if ($this->config['cacheQuery'] && $doQuery) {
             $key = serialize(array_merge($this->config, $asContext));
             $hash = md5($key);
             $cacheOptions = array(xPDO::OPT_CACHE_KEY => 'advsearch');
@@ -145,7 +134,7 @@ class AdvSearchRequest extends AdvSearch {
             $this->getHooks('postHook');
 
             // display results
-            $outputType = array_map('trim', @explode(',', $this->config['output']));
+            $outputType = $this->config['output'];
             $out = array();
             foreach ($outputType as $to) {
                 if ($to == 'html') {
@@ -166,8 +155,8 @@ class AdvSearchRequest extends AdvSearch {
                 $out['ppg'] = $this->config['perPage'];
                 $out['nbr'] = $outputCount;
                 $out['pgt'] = $this->config['pagingType'];
-                $out['opc'] = $this->config['opacity'];
-                $out['eff'] = $this->config['effect'];
+                // $out['opc'] = $this->config['opacity'];
+                // $out['eff'] = $this->config['effect'];
 
                 $output = json_encode($out);
             } else {
@@ -194,8 +183,8 @@ class AdvSearchRequest extends AdvSearch {
         // query: search term entered by user, total: number of results, etime: elapsed time
         $placeholders = array(
             'resultInfo' => $this->_getResultInfo($outputCount),
-            'moreResults' => $this->_getMoreLink(),
-            'query' => $this->searchString,
+            // 'moreResults' => $this->_getMoreLink(),
+            'query' => htmlspecialchars($this->searchString),
             'total' => $outputCount,
             'etime' => $this->getElapsedTime(),
         );
@@ -210,7 +199,7 @@ class AdvSearchRequest extends AdvSearch {
     }
 
     /**
-     * _initSearchString - initialize searchString && searchQuery
+     * _initSearchString - initialize searchString
      * @access private
      * @param string $defaultString Default search string value
      * @return void
@@ -221,22 +210,54 @@ class AdvSearchRequest extends AdvSearch {
         }
 
         $searchString = '';
-        $filteredString = filter_input(INPUT_GET, $this->config['searchIndex'], FILTER_SANITIZE_SPECIAL_CHARS);
-        if (!empty($filteredString)) {
-            $searchString = $this->sanitizeSearchString($filteredString);
-        } else {
-            $searchString = $defaultString;
-        }
+        $searchString = $_REQUEST[$this->config['searchParam']] ?? $defaultString; //filter_input(INPUT_GET, $this->config['searchParam'], FILTER_SANITIZE_STRING);
+        $searchString = $this->sanitizeSearchString($searchString);
+        // if (!empty($filteredString)) {
+        //     $searchString = $this->sanitizeSearchString($filteredString);
+        // } else {
+        //     $searchString = $defaultString;
+        // }
 
         $this->searchString = $searchString;
-        $this->searchQuery = null;
-        $matches = null;
-        preg_match('/^(\'|")[\s\S](\'|")$/', $searchString, $matches);
-        if ($matches) {
-            $this->validTerm($searchString, 'phrase', true);
-        } else {
-            $this->validTerm($searchString, 'word', true);
+
+        if (empty($searchString) && !($this->config['init'] === 'all')) {
+            $msgerr = $this->modx->lexicon('advsearch.minchars', array(
+                'minterm' => '',
+                'minchars' => $this->config['minChars']
+            ));
+            $this->setError($msgerr);
+
+            return false;
         }
+
+        $terms = array_map('trim', explode(' ', $searchString));
+        $terms = array_filter($terms); //remove empty elements
+        foreach ($terms as $term) {
+            $valid = $this->validTerm($term, 'word', true);
+            if ($valid) {
+                $this->searchTerms[] = $term;
+            }
+            // if (!$valid) {
+            //     return false;
+            // }
+        }
+
+        if (count($this->searchTerms) > $this->config['maxWords']) {
+            $msgerr = $this->modx->lexicon('advsearch.maxwords', array(
+                'maxwords' => $this->config['maxWords']
+            ));
+            $this->setError($msgerr);
+
+            return false;
+        }
+
+        // $matches = null;
+        // preg_match('/^(\'|")[\s\S]*(\'|")$/', $searchString, $matches);
+        // if ($matches) {
+        //     $this->validTerm($searchString, 'phrase', true);
+        // } else {
+        //     $this->validTerm($searchString, 'word', true);
+        // }
 
         return true;
     }
@@ -272,7 +293,6 @@ class AdvSearchRequest extends AdvSearch {
             } elseif ($type === 'postHook') {
                 $asHooks->loadMultiple($this->config[$type], array(
                     'hooks' => $this->config[$type],
-                    'offset' => $this->offset,
                     'page' => $this->page,
                     'perPage' => $this->config['perPage'],
                     'postHookTpls' => $this->config['postHookTpls']

@@ -46,12 +46,13 @@ class MySql extends Base {
             ]);
         }
 
-        if (!empty($asContext['searchString'])) {
+        //if (!empty($asContext['searchString'])) {
+        if (count($asContext['searchTerms']) > 0) {
             $fulltext = false;
             if ($fulltext) {
                 // fulltext searching
                 $mainFields = array();
-                foreach ($asContext['mainFields'] as $field) {
+                foreach ($asContext['mainWhereFields'] as $field) {
                     $mainFields[] = 'modResource.' . $field;
                 }
                 $mainFields = @implode(',', $mainFields);
@@ -78,13 +79,13 @@ class MySql extends Base {
                 $c->having("($having)");
             } else {
                 // textlike searching
-                $searchStrings = array_map('trim', @explode(' ', $asContext['searchString']));
+                // $searchStrings = array_map('trim', @explode(' ', $asContext['searchString']));
                 $conditions = array();
-                foreach ($asContext['mainFields'] as $field) {
+                foreach ($asContext['mainWhereFields'] as $field) {
                     if ($field === 'id' || $field === 'template') {
                         continue;
                     }
-                    foreach ($searchStrings as $string) {
+                    foreach ($asContext['searchTerms'] as $string) {
                         $conditions[] = array(
                             'modResource.' . $field . ':LIKE' => "%$string%"
                         );
@@ -92,11 +93,11 @@ class MySql extends Base {
                 }
 
                 //=============================  add TV where the search should occur (&withTVs parameter)
-                if (!empty($asContext['tvWhereFields']) && !empty($asContext['searchString'])) {
+                if (!empty($asContext['tvWhereFields'])) { //&& !empty($asContext['searchString'])) {
                     foreach ($asContext['tvWhereFields'] as $tv) {
                         if (!empty($asContext['searchString'])) {
-                            $searchStrings = array_map('trim', @explode(' ', $asContext['searchString']));
-                            foreach ($searchStrings as $string) {
+                            // $searchStrings = array_map('trim', @explode(' ', $asContext['searchString']));
+                            foreach ($asContext['searchTerms'] as $string) {
                                 $conditions[] = array(
                                     $this->modx->escape($tv . '_cv.value') . ':LIKE' => "%$string%",
                                 );
@@ -293,7 +294,6 @@ class MySql extends Base {
      *
      * @access private
      * @param array $results array of results
-     * @param integer $offset offset of the result page
      * @return xPDOQuery Returns the modified query
      */
     private function _prepareResults($results) {
@@ -322,8 +322,8 @@ class MySql extends Base {
      */
     private function _appendTVsFields($collection, $asContext) {
         $results = array();
-        $displayedFields = array_merge($asContext['mainFields'], $asContext['joinedFields']);
-        $allowedTvNames = array_merge($asContext['tvWhereFields'], $asContext['tvFields']);
+        $displayedFields = array_unique(array_merge($asContext['mainFields'], $asContext['joinedFields']));
+        $allowedTvNames = $asContext['tvFields']; //array_unique(array_merge($asContext['tvWhereFields'], $asContext['tvFields']));
 
         if (count($allowedTvNames)) {
             foreach ($collection as $resourceId => $resource) {

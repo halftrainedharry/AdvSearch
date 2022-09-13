@@ -163,8 +163,8 @@ class AdvSearchHooks {
             $asform = strip_tags($_REQUEST['asform']);
             $formParams = json_decode($asform);
             $excluded = array('id', 'asid', 'sub');
-            $excluded[] = $this->search->config['searchIndex'];
-            $excluded[] = $this->search->config['offsetIndex'];
+            $excluded[] = $this->search->config['searchParam'];
+            $excluded[] = $this->search->config['pageParam'];
             foreach ($formParams as $key => $val) {
                 $key = trim($key, "[]");
                 if (!(in_array($key, $excluded))) {

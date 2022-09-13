@@ -48,8 +48,8 @@ class AdvSearchForm extends AdvSearch {
         $this->searchString = $this->_initSearchString();
 
         // set up the search form
-        // &resultsWindowTpl [ chunk name | 'ResultsWindow' ]
-        $this->config['resultsWindowTpl'] = $this->modx->getOption('resultsWindowTpl', $this->config, 'ResultsWindow');
+        // &resultsWindowTpl [ chunk name | 'AdvSearchResultsWindow' ]
+        $this->config['resultsWindowTpl'] = $this->modx->getOption('resultsWindowTpl', $this->config, 'AdvSearchResultsWindow');
 
         // add the <div></div> section to set the results window throught jscript
         if ($this->config['withAjax']) {
@@ -60,7 +60,7 @@ class AdvSearchForm extends AdvSearch {
         }
 
         // &method - [ post | get ]
-        $this->config['method'] = strtolower($this->modx->getOption('method', $this->config, 'get'));
+        // $this->config['method'] = strtolower($this->modx->getOption('method', $this->config, 'get'));
 
         // &landing  [ int id of a document | 0 ]
         $landing = (int) $this->modx->getOption('landing', $this->config, 0);
@@ -69,8 +69,8 @@ class AdvSearchForm extends AdvSearch {
         // &liveSearch - [ 1 | 0 ]
         $this->config['liveSearch'] = (bool) (int) $this->modx->getOption('liveSearch', $this->config, 0);
 
-        // &searchIndex - [ search | any string ]
-        $this->config['searchIndex'] = trim($this->modx->getOption('searchIndex', $this->config, 'search'));
+        // &searchParam - [ search | any string ]
+        // $this->config['searchParam'] = trim($this->modx->getOption('searchParam', $this->config, 'search'));
 
         // &uncacheScripts - [ 1 | 0 ]
         $uncacheScripts = (bool) (int) $this->modx->getOption('uncacheScripts', $this->config, 1);
@@ -81,8 +81,8 @@ class AdvSearchForm extends AdvSearch {
             'method' => $this->config['method'],
             'landing' => $this->config['landing'],
             'asId' => $this->config['asId'],
-            'searchValue' => $this->searchString,
-            'searchIndex' => $this->config['searchIndex'],
+            'searchValue' => htmlspecialchars($this->searchString),
+            'searchParam' => $this->config['searchParam'],
             'liveSearch' => $this->config['liveSearch'],
             'resultsWindow' => $resultsWindow
         );
@@ -96,7 +96,7 @@ class AdvSearchForm extends AdvSearch {
         // &tpl [ chunk name | 'AdvSearchForm' ]
         $this->config['tpl'] = $this->modx->getOption('tpl', $this->config, 'AdvSearchForm');
 
-        $placeholders = $this->setPlaceholders($placeholders, $this->config['placeholderPrefix']);
+        $placeholders = $this->cleanPlaceholders($placeholders);
         // set the form into a placeholder if requested
         $output = $this->processElementTags($this->parseTpl($this->config['tpl'], $placeholders));
         if (!empty($this->config['toPlaceholder'])) {
@@ -118,6 +118,7 @@ class AdvSearchForm extends AdvSearch {
 
             // &jsJQuery - [ Location of the jQuery javascript library ]
             $this->config['jsJQuery'] = $this->modx->getOption('jsJQuery', $this->config, $this->config['assetsUrl'] . 'js/jquery-1.10.2.min.js');
+            $this->config['jsJQuery'] = $this->replacePropPhs($this->config['jsJQuery']);
 
             // include or not the jQuery library (required for clear default text, ajax mode)
             if ($this->config['addJQuery'] == 1) {
@@ -126,11 +127,10 @@ class AdvSearchForm extends AdvSearch {
             } elseif ($this->config['addJQuery'] == 2) {
                 $this->modx->regClientHTMLBlock('<script>window.jQuery || document.write(\'<script src="' . $this->config['jsJQuery'] . '"><\/script>\');</script>');
             }
-        }
 
-        if ($this->config['withAjax']) {
             // &jsSearch - [ url | $assetsUrl . 'js/advsearch.min.js' ]
             $this->config['jsSearch'] = $this->modx->getOption('jsSearch', $this->config, $this->config['assetsUrl'] . 'js/advsearch.min.js');
+            $this->config['jsSearch'] = $this->replacePropPhs($this->config['jsSearch']);
 
             // &jsPopulateForm - [ js populate form library ]
             $this->config['jsPopulateForm'] = $this->modx->getOption('jsPopulateForm', $this->config, $this->config['assetsUrl'] . 'vendors/populate/jquery.populate.pack.js');
@@ -170,14 +170,11 @@ class AdvSearchForm extends AdvSearch {
             if ($this->config['liveSearch']) {
                 $jsHeaderArray['ls'] = $this->config['liveSearch'];
             }
-            if ($this->config['searchIndex'] != 'search') {
-                $jsHeaderArray['sx'] = $this->config['searchIndex'];
+            if ($this->config['searchParam'] != 'search') {
+                $jsHeaderArray['sx'] = $this->config['searchParam'];
             }
-            if ($this->config['offsetIndex'] != 'offset') {
-                $jsHeaderArray['ox'] = $this->config['offsetIndex'];
-            }
-            if ($this->config['pageIndex'] != 'page') {
-                $jsHeaderArray['pax'] = $this->config['pageIndex'];
+            if ($this->config['pageParam'] != 'page') {
+                $jsHeaderArray['pax'] = $this->config['pageParam'];
             }
             if ($this->config['init'] != 'none') {
                 $jsHeaderArray['ii'] = $this->config['init'];
@@ -209,6 +206,15 @@ class AdvSearchForm extends AdvSearch {
                 $jsHeaderArray['acii'] = $this->modx->getOption('ajaxCloseImageDOMId', $this->config);
             }
 
+            // &opacity - [ 0. < float <= 1. ]  Should be a float value
+            $opacity = floatval($this->modx->getOption('opacity', $this->config, 1.));
+            $this->config['opacity'] = ($opacity > 0. && $opacity <= 1.) ? $opacity : 1.0;
+            $jsHeaderArray['opacity'] = $this->config['opacity'];
+
+            // &effect - [ 'basic' | 'showfade' | 'slidefade' ]
+            $this->config['effect'] = $this->modx->getOption('effect', $this->config, 'basic');
+            $jsHeaderArray['effect'] = $this->config['effect'];
+
             /**
              * Google Map
              */
@@ -218,7 +224,7 @@ class AdvSearchForm extends AdvSearch {
             $jsHeaderArray['gmpTtl'] = $this->modx->getOption('googleMapMarkerTitleField', $this->config);
             $googleMapMarkerWindowId  = intval($this->modx->getOption('googleMapMarkerWindowId', $this->config));
             if (!empty($googleMapMarkerWindowId)) {
-                $jsHeaderArray['gmpWin'] = $this->modx->makeUrl($googleMapMarkerWindowId);
+                $jsHeaderArray['gmpWin'] = $this->modx->makeUrl($googleMapMarkerWindowId, '', '', $this->config['urlScheme']);
             }
             $jsHeaderArray['gmpZoom'] = (int) $this->modx->getOption('googleMapZoom', $this->config, 5);
             $jsHeaderArray['gmpCenterLat'] = $this->modx->getOption('googleMapCenterLat', $this->config);
@@ -246,6 +252,7 @@ class AdvSearchForm extends AdvSearch {
 <!-- start AdvSearch header -->
 <script type="text/javascript">
 //<![CDATA[
+var advsea = new Array();
 {$jsline}
 //]]>
 </script>
@@ -272,8 +279,11 @@ EOD;
      */
     private function _initSearchString() {
         $searchString = '';
-        if (isset($_REQUEST[$this->config['searchIndex']]) && (!empty($_REQUEST[$this->config['searchIndex']])) && ($this->forThisInstance())) {
-            $searchString = $this->sanitizeSearchString($_REQUEST[$this->config['searchIndex']]);
+        if (isset($this->config['searchString'])) {
+            $searchString = $this->config['searchString']; //default value
+        }
+        if (isset($_REQUEST[$this->config['searchParam']]) && (!empty($_REQUEST[$this->config['searchParam']])) && ($this->forThisInstance())) {
+            $searchString = $this->sanitizeSearchString($_REQUEST[$this->config['searchParam']]);
         }
         return $searchString;
     }

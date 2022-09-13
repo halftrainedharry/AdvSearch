@@ -362,7 +362,7 @@ With as content for the chunk 'dvd2SearchForm':
     <input type="hidden" name="id" value="[[+landing]]" />
     <input type="hidden" name="asId" value="[[+asId]]" />
     <label>Title or description:<br>
-        <input type="text" id="[[+asId]]_search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+        <input type="text" id="[[+asId]]_search" name="[[+searchParam]]" value="[[+searchValue]]" />
     </label>
     <br><br>
     <label><span>Category: </span>
@@ -581,7 +581,7 @@ With as content for the chunk 'filter4SearchForm':
     <fieldset>
         <input type="hidden" name="id" value="[[+landing]]" />
         <input type="hidden" name="asId" value="[[+asId]]" />
-        <input type="text" id="[[+asId]]_search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+        <input type="text" id="[[+asId]]_search" name="[[+searchParam]]" value="[[+searchValue]]" />
         <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
         <br><br>
         <label>Select the number of results per page:&nbsp;
@@ -621,7 +621,7 @@ And the inside the AdvSearch snippet call we add: ``&queryHook=`Filter4QHook` ``
 
 To allow the user to change the sort of results displayed, use the 'sortby' declaration.
 
-Simply add: 'sortby ' => $sort as array element of $qhDeclation. Where $sort contains the tag name which hold the csv list of fields to use for the sort.
+Simply add `'sortby ' => $sort` as an array element of `$qhDeclaration`. Where $sort contains the request parameter name which holds the comma-separated list of fields to use for the sort.
 
 ### Example 5 – Filter5 - sortedby
 
@@ -638,7 +638,7 @@ With as content for the chunk 'filter5SearchForm':
     <fieldset>
         <input type="hidden" name="id" value="[[+landing]]" />
         <input type="hidden" name="asId" value="[[+asId]]" />
-        <input type="text" id="[[+asId]]_search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+        <input type="text" id="[[+asId]]_search" name="[[+searchParam]]" value="[[+searchValue]]" />
         <input type="submit" name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />
         <br><br>
         <label>Choose how you want sort the search results:&nbsp;
@@ -695,7 +695,7 @@ and optionally (these parameters could be passed thru the snippet call):
 * **fields** - A comma-separated list of column names to display.
 * **ids** - A comma-separated list of primary keys to filter where the search should occurs.
 * **where** - criteria or Array of criteria. Column names should be prefixed by class name and wrapped with backticks.
-* **sortby** - csv list of couple 'columnName ASC|DESC'. Column names should be prefixed by class name and wrapped with backticks.
+* **sortby** - Comma-separated list of 'columnName ASC|DESC' couples. Column names should be prefixed by class name and wrapped with backticks.
 As example for the dvdProduct class we write:
 
 ```php

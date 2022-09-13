@@ -67,26 +67,12 @@ snippets:
         type: textfield
         value: pagetitle,longtitle,alias,description,introtext,content
         lexicon: advsearch:properties
-      - name: effect
-        description: advsearch.advsearch_effect_desc
-        type: list
-        options:
-          - text: basic
-            value: basic
-          - text: showfade
-            value: showfade
-          - text: slidefade
-            value: slidefade
-        value: basic
-        lexicon: advsearch:properties
       - name: engine
         description: advsearch.advsearch_engine_desc
         type: list
         options:
           - text: MySql
             value: MySql
-          - text: All
-            value: All
         value: MySql
         lexicon: advsearch:properties
       - name: extractEllipsis
@@ -103,11 +89,6 @@ snippets:
         description: advsearch.advsearch_extractTpl_desc
         type: textfield
         value: AdvSearchExtract
-        lexicon: advsearch:properties
-      - name: fieldPotency
-        description: advsearch.advsearch_fieldPotency_desc
-        type: textfield
-        value: createdon
         lexicon: advsearch:properties
       - name: highlightClass
         description: advsearch.advsearch_highlightClass_desc
@@ -166,25 +147,10 @@ snippets:
             value: all
         value: none
         lexicon: advsearch:properties
-      - name: libraryPath
-        description: advsearch.advsearch_libraryPath_desc
-        type: textfield
-        value: libraries/
-        lexicon: advsearch:properties
       - name: maxWords
         description: advsearch.advsearch_maxWords_desc
         type: numberfield
         value: '20'
-        lexicon: advsearch:properties
-      - name: method
-        description: advsearch.advsearch_method_desc
-        type: list
-        options:
-          - text: POST
-            value: POST
-          - text: GET
-            value: GET
-        value: GET
         lexicon: advsearch:properties
       - name: minChars
         description: advsearch.advsearch_minChars_desc
@@ -199,12 +165,7 @@ snippets:
       - name: moreResultsTpl
         description: advsearch.advsearch_moreResultsTpl_desc
         type: textfield
-        value: MoreResults
-        lexicon: advsearch:properties
-      - name: offsetIndex
-        description: advsearch.advsearch_offsetIndex_desc
-        type: textfield
-        value: offset
+        value: AdvSearchMoreResults
         lexicon: advsearch:properties
       - name: output
         description: advsearch.advsearch_output_desc
@@ -240,25 +201,20 @@ snippets:
         type: numberfield
         value: '10'
         lexicon: advsearch:properties
-      - name: placeholderPrefix
-        description: advsearch.advsearch_placeholderPrefix_desc
-        type: textfield
-        value: ''
-        lexicon: advsearch:properties
       - name: queryHook
         description: advsearch.advsearch_queryHook_desc
         type: textfield
         value: ''
         lexicon: advsearch:properties
-      - name: searchIndex
-        description: advsearch.advsearch_searchIndex_desc
+      - name: searchParam
+        description: advsearch.advsearch_searchParam_desc
         type: textfield
         value: search
         lexicon: advsearch:properties
       - name: sortby
         description: advsearch.advsearch_sortby_desc
         type: textfield
-        value: createdon DESC
+        value: id DESC
         lexicon: advsearch:properties
       - name: showExtract
         description: advsearch.advsearch_showExtract_desc
@@ -368,13 +324,25 @@ snippets:
             value: GET
         value: GET
         lexicon: advsearch:properties
+      - name: effect
+        description: advsearch.advsearch_effect_desc
+        type: list
+        options:
+          - text: basic
+            value: basic
+          - text: showfade
+            value: showfade
+          - text: slidefade
+            value: slidefade
+        value: basic
+        lexicon: advsearch:properties
       - name: opacity
         description: advsearch.advsearchform_opacity_desc
         type: numberfield
         value: '1.'
         lexicon: advsearch:properties
-      - name: searchIndex
-        description: advsearch.advsearchform_searchIndex_desc
+      - name: searchParam
+        description: advsearch.advsearchform_searchParam_desc
         type: textfield
         value: search
         lexicon: advsearch:properties

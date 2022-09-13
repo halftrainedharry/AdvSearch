@@ -2,7 +2,7 @@
   <fieldset>
     <input type="hidden" name="id" value="[[+landing]]" />
     <input type="hidden" name="asId" value="[[+asId]]" />
-    <input type="text" id="[[+asId]]_advsea-search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+    <input type="text" id="[[+asId]]_advsea-search" name="[[+searchParam]]" value="[[+searchValue]]" />
     [[+liveSearch:isnot=`1`:then=`<input type="submit" id="[[+asId]]_advsea-submit"  name="sub" value="[[%advsearch.search? &namespace=`advsearch` &topic=`default`]]" />`]]
     <br /><br />
     <label>Select the number of results per page:&nbsp;

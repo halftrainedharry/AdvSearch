@@ -24,9 +24,9 @@ abstract class Base extends AdvSearch {
     protected $page = 1;
     protected $queryHook = null;
     protected $ids = array();
-    protected $sortbyClass = array();
-    protected $sortbyField = array();
-    protected $sortbyDir = array();
+    // protected $sortbyClass = array();
+    // protected $sortbyField = array();
+    // protected $sortbyDir = array();
     protected $mainWhereFields = array();
     protected $joinedWhereFields = array();
     protected $tvWhereFields = array();

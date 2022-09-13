@@ -44,7 +44,7 @@
     </label>
     <br /><br />
 	<label>Add an optional keyword: </label>
-    <input type="text" id="[[+asId]]_advsea-search" name="[[+searchIndex]]" value="[[+searchValue]]" />
+    <input type="text" id="[[+asId]]_advsea-search" name="[[+searchParam]]" value="[[+searchValue]]" />
 	<br /><br />
 	<label>Select a number of results per page:&nbsp;
 	<select name="ppage">

@@ -1,4 +1,5 @@
 <?php
+use xPDO\xPDO;
 use AdvSearch\AdvSearchForm;
 /**
  * AdvSearchForm
@@ -18,7 +19,12 @@ use AdvSearch\AdvSearchForm;
  *
  * -----------------------------------------------------------------------------
  */
-$searchForm = new AdvSearchForm($modx, $scriptProperties);
-$output = $searchForm->output();
-
-return $output;
+try {
+    $searchForm = new AdvSearchForm($modx, $scriptProperties);
+    $output = $searchForm->output();
+    return $output;
+}
+catch (\Exception $e) {
+    $modx->log(xPDO::LOG_LEVEL_ERROR, $e->getMessage());
+}
+return '';
