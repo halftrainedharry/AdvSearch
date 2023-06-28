@@ -27,16 +27,16 @@ class MySql extends Base {
         // multiple parents support
         if (!empty($this->config['parents'])) {
             $parents = array_map('trim', @explode(',', $this->config['parents']));
-            $c->where(array(
+            $c->where([
                 'modResource.parent:IN' => $parents
-            ));
+            ]);
         }
         // multiple ids support
         if (!empty($this->config['ids'])) {
             $ids = array_map('trim', @explode(',', $this->config['ids']));
-            $c->where(array(
+            $c->where([
                 'modResource.id:IN' => $ids
-            ));
+            ]);
         }
         // hideLinks
         if ($this->config['hideLinks']) {
@@ -51,44 +51,44 @@ class MySql extends Base {
             $fulltext = false;
             if ($fulltext) {
                 // fulltext searching
-                $mainFields = array();
+                $mainFields = [];
                 foreach ($asContext['mainWhereFields'] as $field) {
                     $mainFields[] = 'modResource.' . $field;
                 }
                 $mainFields = @implode(',', $mainFields);
-                $c->select(array(
+                $c->select([
                     $this->modx->escape('mainFields_score') => "MATCH ($mainFields) AGAINST ('{$asContext['searchString']}' IN BOOLEAN MODE)"
-                ));
-                $conditions = array();
+                ]);
+                $conditions = [];
                 $conditions[] = "MATCH ($mainFields) AGAINST ('{$asContext['searchString']}' IN BOOLEAN MODE)";
                 $having = "mainFields_score > 0";
                 //=============================  add TV where the search should occur (&withTVs parameter)
                 if (!empty($asContext['tvWhereFields']) && !empty($asContext['searchString'])) {
-                    $tvWhereFields = array();
+                    $tvWhereFields = [];
                     foreach ($asContext['tvWhereFields'] as $tv) {
                         $tvWhereFields[] = '`' . $tv . '_cv`.`value`';
                     }
                     $tvWhereFields = @implode(',', $tvWhereFields);
-                    $c->select(array(
+                    $c->select([
                         $this->modx->escape('tvWhereFields_score') => "MATCH ($tvWhereFields) AGAINST ('{$asContext['searchString']}' IN BOOLEAN MODE)"
-                    ));
+                    ]);
                     $conditions[] = "MATCH ($tvWhereFields) AGAINST ('{$asContext['searchString']}' IN BOOLEAN MODE)";
                     $having = $having . " OR tvWhereFields_score > 0";
                 }
-                $c->orCondition(array($conditions));
+                $c->orCondition([$conditions]);
                 $c->having("($having)");
             } else {
                 // textlike searching
                 // $searchStrings = array_map('trim', @explode(' ', $asContext['searchString']));
-                $conditions = array();
+                $conditions = [];
                 foreach ($asContext['mainWhereFields'] as $field) {
                     if ($field === 'id' || $field === 'template') {
                         continue;
                     }
                     foreach ($asContext['searchTerms'] as $string) {
-                        $conditions[] = array(
+                        $conditions[] = [
                             'modResource.' . $field . ':LIKE' => "%$string%"
-                        );
+                        ];
                     }
                 }
 
@@ -98,15 +98,15 @@ class MySql extends Base {
                         if (!empty($asContext['searchString'])) {
                             // $searchStrings = array_map('trim', @explode(' ', $asContext['searchString']));
                             foreach ($asContext['searchTerms'] as $string) {
-                                $conditions[] = array(
+                                $conditions[] = [
                                     $this->modx->escape($tv . '_cv.value') . ':LIKE' => "%$string%",
-                                );
+                                ];
                             }
                         }
                     }
                 }
 
-                $c->orCondition(array($conditions));
+                $c->orCondition([$conditions]);
             }
         }
 
@@ -115,17 +115,17 @@ class MySql extends Base {
                 $etv = $this->modx->escape($tv);
                 $tvcv = $tv . '_cv';
                 $etvcv = $this->modx->escape($tvcv);
-                $c->leftJoin('modTemplateVar', $tv, array(
+                $c->leftJoin('modTemplateVar', $tv, [
                     "{$etv}.`name` = '{$tv}'"
-                ));
-                $c->leftJoin('modTemplateVarResource', $tv . '_cv', array(
+                ]);
+                $c->leftJoin('modTemplateVarResource', $tv . '_cv', [
                     "{$etvcv}.`contentid` = `modResource`.`id`",
                     "{$etvcv}.`tmplvarid` = {$etv}.`id`"
-                ));
+                ]);
 //                $c->select("IFNULL({$etvcv}.`value`, {$etv}.`default_text`) AS {$etv}");
-                $c->select(array(
+                $c->select([
                     $etv => "IFNULL({$etvcv}.`value`, {$etv}.`default_text`)"
-                ));
+                ]);
             }
         }
 
@@ -134,24 +134,24 @@ class MySql extends Base {
 
         //============================= add pre-conditions (published, searchable, undeleted, lstIds, hideMenu, hideContainers)
         // restrict search to published, searcheable and undeleted modResource resources
-        $c->andCondition(array('published' => '1', 'searchable' => '1', 'deleted' => '0'));
+        $c->andCondition(['published' => '1', 'searchable' => '1', 'deleted' => '0']);
 
         // hideMenu
         if ($this->config['hideMenu'] == 0) {
-            $c->andCondition(array('hidemenu' => '0'));
+            $c->andCondition(['hidemenu' => '0']);
         } elseif ($this->config['hideMenu'] == 1) {
-            $c->andCondition(array('hidemenu' => '1'));
+            $c->andCondition(['hidemenu' => '1']);
         } else {
             // if &hideMenu=2 or anything else, ignore hideMenu option
         }
 
         // hideContainers
         if ($this->config['hideContainers']) {
-            $c->andCondition(array('isfolder' => '0'));
+            $c->andCondition(['isfolder' => '0']);
         }
 
         // multiple context support
-        $contexts = array();
+        $contexts = [];
         if (!empty($this->config['contexts'])) {
             $contextArray = explode(',', $this->config['contexts']);
             foreach ($contextArray as $ctx) {
@@ -160,9 +160,9 @@ class MySql extends Base {
         } else {
             $contexts[] = $this->modx->context->get('key');
         }
-        $c->where(array(
+        $c->where([
             'modResource.context_key:IN' => $contexts
-        ));
+        ]);
 
         //============================= add query conditions
         if (!empty($asContext['queryHook']['andConditions'])) {
@@ -250,12 +250,12 @@ class MySql extends Base {
      * @return array Returns an array of results
      */
     private function _runStmt(xPDOQuery $c, $asContext) {
-        $results = array();
+        $results = [];
         $allowedTvNames = array_merge($asContext['tvWhereFields'], $asContext['tvFields']);
         $c->prepare();
         $sql = $c->toSQL();
-        $patterns = array('{sql}');
-        $replacements = array($sql);
+        $patterns = ['{sql}'];
+        $replacements = [$sql];
         $sql = str_replace($patterns, $replacements, $asContext['queryHook']['stmt']['execute']);
         $this->ifDebug('sql: ' . $sql, __METHOD__, __FILE__, __LINE__);
         unset($c);
@@ -270,8 +270,8 @@ class MySql extends Base {
                 if (count($allowedTvNames)) {
                     while ($row = $c->stmt->fetch(\PDO::FETCH_ASSOC)) {
                         // Append & render tv fields (includeTVs, withTVs)
-                        $tvs = array();
-                        $templateVars = $this->modx->getCollection(modTemplateVar::class, array('name:IN' => $allowedTvNames));
+                        $tvs = [];
+                        $templateVars = $this->modx->getCollection(modTemplateVar::class, ['name:IN' => $allowedTvNames]);
                         foreach ($templateVars as $tv) {
                             $tvs[$tv->get('name')] = $tv->renderOutput($row['id']);
                         }
@@ -298,7 +298,7 @@ class MySql extends Base {
      */
     private function _prepareResults($results) {
         // return search results as an associative array with id as key
-        $searchResults = array();
+        $searchResults = [];
         foreach ($results as $result) {
             $index = 'as' . $result['id'];
             $searchResults[$index] = $result;
@@ -321,15 +321,15 @@ class MySql extends Base {
      * @return array Returns an array of results
      */
     private function _appendTVsFields($collection, $asContext) {
-        $results = array();
+        $results = [];
         $displayedFields = array_unique(array_merge($asContext['mainFields'], $asContext['joinedFields']));
         $allowedTvNames = $asContext['tvFields']; //array_unique(array_merge($asContext['tvWhereFields'], $asContext['tvFields']));
 
         if (count($allowedTvNames)) {
             foreach ($collection as $resourceId => $resource) {
                 $result = $resource->get($displayedFields);
-                $tvs = array();
-                $templateVars = $this->modx->getCollection(modTemplateVar::class, array('name:IN' => $allowedTvNames));
+                $tvs = [];
+                $templateVars = $this->modx->getCollection(modTemplateVar::class, ['name:IN' => $allowedTvNames]);
                 foreach ($templateVars as $tv) {
                     $tvs[$tv->get('name')] = $tv->renderOutput($result['id']);
                 }

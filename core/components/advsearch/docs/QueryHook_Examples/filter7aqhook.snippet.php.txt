@@ -21,14 +21,14 @@ else $parent = '38'; // english documents
 $ids = $modx->getChildIds($parent, 10); //get the array of ids of the children resources
 $lstids = implode(',',$ids);
 
-$andConditions = array(
+$andConditions = [
     'modResource.id:IN' => $lstids . ':integer'
-);
+];
 
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.1',
 	'andConditions' => $andConditions
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 return true;

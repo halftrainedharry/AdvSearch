@@ -23,29 +23,29 @@ class AdvSearch {
     const RELEASE = 'alpha';
 
     public $modx;
-    public $config = array();
+    public $config = [];
     protected $searchString = ''; //raw search string
-    protected $searchTerms = array();
+    protected $searchTerms = [];
     protected $tstart;
     protected $debug = false;
     /**
      * To hold error message
      * @var string
      */
-    private $_error = array();
+    private $_error = [];
 
     /**
      * To hold placeholder array, flatten array with prefix
      * @var array
      */
-    // private $_placeholders = array();
+    // private $_placeholders = [];
     /**
      * store the chunk's HTML to property to save memory of loop rendering
      * @var array
      */
-    private $_chunks = array();
+    private $_chunks = [];
 
-    public function __construct(modX &$modx, array &$config = array()) {
+    public function __construct(modX &$modx, array &$config = []) {
 
         // get time of starting
         $mtime = explode(" ", microtime());
@@ -60,7 +60,7 @@ class AdvSearch {
             error_reporting(E_ALL);
             ini_set('display_error', true);
             if ($config['withAjax']) {
-                // $this->_placeholders['debug'] = array();
+                // $this->_placeholders['debug'] = [];
                 $this->modx->setLogTarget('FILE');
             } else {
                 $this->modx->setLogTarget('HTML');
@@ -89,12 +89,12 @@ class AdvSearch {
         // path and url
         $corePath = $this->modx->getOption('advsearch.core_path', null, $this->modx->getOption('core_path') . 'components/advsearch/');
         $assetsUrl = $this->modx->getOption('advsearch.assets_url', null, 'assets/components/advsearch/');
-        $this->config = array_merge(array(
+        $this->config = array_merge([
             'corePath' => $corePath,
             'assetsUrl' => $assetsUrl,
             'chunksPath' => $corePath . 'elements/chunks/',
             'modelPath' => $corePath . 'model/',
-                ), $config);
+        ], $config);
 
         $this->config = array_map("trim", $this->config);
 
@@ -107,12 +107,12 @@ class AdvSearch {
         $this->config = array_map("trim", $this->config);
 
         $revoVersion = $this->modx->getVersionData();
-        $systemInfo = array(
+        $systemInfo = [
             "MODx version" => $revoVersion['full_version'],
             "Php version" => phpversion(),
             "MySql version" => $this->getMysqlVersion(),
             "AdvSearch version" => self::VERSION . ' ' . self::RELEASE,
-        );
+        ];
         if ($this->debug) {
             $this->modx->log(modX::LOG_LEVEL_DEBUG, '[AdvSearch] System environment: ' . print_r($systemInfo, true), '', __METHOD__);
             $this->modx->log(modX::LOG_LEVEL_DEBUG, '[AdvSearch] Config parameters before checking: ' . print_r($this->config, true), '', __METHOD__);
@@ -185,7 +185,7 @@ class AdvSearch {
      * Set class configuration exclusively for multiple snippet calls
      * @param   array   $config     snippet's parameters
      */
-    public function setConfigs(array $config = array()) {
+    public function setConfigs(array $config = []) {
         $this->config = array_merge($this->config, $config);
     }
 
@@ -285,8 +285,8 @@ class AdvSearch {
      * @param   array   $holder     to hold temporary array results
      * @return  array   one level array
      */
-    public function implodePhs(array $array, $keyName = null, $separator = '.', array $holder = array()) {
-        $phs = !empty($holder) ? $holder : array();
+    public function implodePhs(array $array, $keyName = null, $separator = '.', array $holder = []) {
+        $phs = !empty($holder) ? $holder : [];
         foreach ($array as $k => $v) {
             $key = !empty($keyName) ? $keyName . $separator . $k : $k;
             if (is_array($v)) {
@@ -327,7 +327,7 @@ class AdvSearch {
      */
     public function trimArray($input, $charlist = null) {
         if (is_array($input)) {
-            $output = array_map(array($this, 'trimArray'), $input);
+            $output = array_map([$this, 'trimArray'], $input);
         } else {
             $output = $this->trimString($input, $charlist);
         }
@@ -342,7 +342,7 @@ class AdvSearch {
      * @return  string  parsed output
      * @link    http://forums.modx.com/thread/74071/help-with-getchunk-and-modx-speed-please?page=2#dis-post-413789
      */
-    public function parseTpl($tpl, array $phs = array()) {
+    public function parseTpl($tpl, array $phs = []) {
         $output = '';
 
         if (isset($this->_chunks[$tpl]) && !empty($this->_chunks[$tpl])) {
@@ -375,7 +375,7 @@ class AdvSearch {
             $tplChunk = ltrim($tpl, ':');
             $tplChunk = trim($tpl);
 
-            $chunk = $this->modx->getObject(modChunk::class, array('name' => $tplChunk), true);
+            $chunk = $this->modx->getObject(modChunk::class, ['name' => $tplChunk], true);
             if (empty($chunk)) {
                 // try to use @splittingred's fallback
                 $f = $this->config['chunksPath'] . $tplChunk . '.chunk.tpl';
@@ -408,7 +408,7 @@ class AdvSearch {
      * @param   array   $phs    placeholders
      * @return  string  parsed output
      */
-    public function parseTplCode($code, array $phs = array()) {
+    public function parseTplCode($code, array $phs = []) {
         $chunk = $this->modx->newObject(modChunk::class);
         $chunk->setContent($code);
         $chunk->setCacheable(false);
@@ -424,7 +424,7 @@ class AdvSearch {
      * @return  string  parsed output
      * @throws  Exception if file is not found
      */
-    public function parseTplFile($file, array $phs = array()) {
+    public function parseTplFile($file, array $phs = []) {
         if (!file_exists($file)) {
             throw new \Exception('File: ' . $file . ' is not found.');
         }
@@ -461,13 +461,13 @@ class AdvSearch {
      * @param   array   $options    option for iteration
      * @return  string  parsed content
      */
-    public function processElementTags($content, array $options = array()) {
+    public function processElementTags($content, array $options = []) {
         $maxIterations = intval($this->modx->getOption('parser_max_iterations', $options, 10));
         if (!$this->modx->parser) {
             $this->modx->getParser();
         }
-        $this->modx->parser->processElementTags('', $content, true, false, '[[', ']]', array(), $maxIterations);
-        $this->modx->parser->processElementTags('', $content, true, true, '[[', ']]', array(), $maxIterations);
+        $this->modx->parser->processElementTags('', $content, true, false, '[[', ']]', [], $maxIterations);
+        $this->modx->parser->processElementTags('', $content, true, true, '[[', ']]', [], $maxIterations);
         return $content;
     }
 
@@ -477,24 +477,24 @@ class AdvSearch {
      * @return  array           The replaced results
      */
     public function replacePropPhs($subject) {
-        $pattern = array(
+        $pattern = [
             '/\{core_path\}/',
             '/\{base_path\}/',
             '/\{assets_url\}/',
             '/\{filemanager_path\}/',
             '/\[\[\+\+core_path\]\]/',
             '/\[\[\+\+base_path\]\]/'
-        );
-        $replacement = array(
+        ];
+        $replacement = [
             $this->modx->getOption('core_path'),
             $this->modx->getOption('base_path'),
             $this->modx->getOption('assets_url'),
             $this->modx->getOption('filemanager_path'),
             $this->modx->getOption('core_path'),
             $this->modx->getOption('base_path')
-        );
+        ];
         if (is_array($subject)) {
-            $parsedString = array();
+            $parsedString = [];
             foreach ($subject as $k => $s) {
                 if (is_array($s)) {
                     $s = $this->replacePropPhs($s);
@@ -587,12 +587,12 @@ class AdvSearch {
      * @return string The select statement
      */
     public function niceQuery(xPDOQuery $query = null) {
-        $searched = array("SELECT", "GROUP_CONCAT", "LEFT JOIN", "INNER JOIN", "EXISTS", "LIMIT", "FROM",
+        $searched = ["SELECT", "GROUP_CONCAT", "LEFT JOIN", "INNER JOIN", "EXISTS", "LIMIT", "FROM",
             "WHERE", "GROUP BY", "HAVING", "ORDER BY", "OR", "AND", "IFNULL", "ON", "MATCH", "AGAINST",
-            "COUNT");
-        $replace = array(" \r\nSELECT", " \r\nGROUP_CONCAT", " \r\nLEFT JOIN", " \r\nINNER JOIN", " \r\nEXISTS", " \r\nLIMIT", " \r\nFROM",
+            "COUNT"];
+        $replace = [" \r\nSELECT", " \r\nGROUP_CONCAT", " \r\nLEFT JOIN", " \r\nINNER JOIN", " \r\nEXISTS", " \r\nLIMIT", " \r\nFROM",
             " \r\nWHERE", " \r\nGROUP BY", " \r\nHAVING", " ORDER BY", " \r\nOR", " \r\nAND", " \r\nIFNULL", " \r\nON", " \r\nMATCH", " \r\nAGAINST",
-            " \r\nCOUNT");
+            " \r\nCOUNT"];
         $output = '';
         if (isset($query)) {
             $query->prepare();
@@ -613,9 +613,9 @@ class AdvSearch {
     public function ifDebug($msg, $def= '', $file= '', $line= '') {
         if ($this->config['debug']) {
             if ($this->config['withAjax']) {
-                $target = array(
+                $target = [
                     'target' => 'FILE',
-                );
+                ];
             } else {
                 $target = 'HTML';
             }
@@ -639,7 +639,7 @@ class AdvSearch {
             $expr= '*';
             if ($pk= $this->modx->getPK($className)) {
                 if (!is_array($pk)) {
-                    $pk= array ($pk);
+                    $pk= [$pk];
                 }
                 $expr= $this->modx->getSelectColumns($className, 'alias', '', $pk);
             }
@@ -689,19 +689,19 @@ class AdvSearch {
             return true;
         } else {
             if (mb_strlen($term) < $this->config['minChars']) {
-                $msgerr = $this->modx->lexicon('advsearch.minchars', array(
+                $msgerr = $this->modx->lexicon('advsearch.minchars', [
                     'minterm' => $term,
                     'minchars' => $this->config['minChars']
-                ));
+                ]);
                 $this->setError($msgerr);
 
                 return false;
             }
             $nbTerms++;
             // if ($nbTerms > $this->config['maxWords']) {
-            //     $msgerr = $this->modx->lexicon('advsearch.maxwords', array(
+            //     $msgerr = $this->modx->lexicon('advsearch.maxwords', [
             //         'maxwords' => $this->config['maxwords']
-            //     ));
+            //     ]);
             //     $this->setError($msgerr);
 
             //     return false;
@@ -724,7 +724,7 @@ class AdvSearch {
      * @param   string  $tag            The html tag name to use to wrap the term found
      * @return  string  Returns highlighted string
      */
-    public function addHighlighting($string, array $searchTerms = array(), $class = 'advsea-highlight', $tag = 'span', $rank_init = null) {
+    public function addHighlighting($string, array $searchTerms = [], $class = 'advsea-highlight', $tag = 'span', $rank_init = null) {
         foreach ($searchTerms as $key => $value) {
             $pattern = preg_quote($value, '/');
             $rank = empty($rank_init) ? ($key + 1) : $rank_init;

@@ -18,7 +18,7 @@ use AdvSearch\AdvSearch;
 
 class AdvSearchForm extends AdvSearch {
 
-    public function __construct(modX &$modx, array $config = array()) {
+    public function __construct(modX &$modx, array $config = []) {
         // ajax mode parameters
         if ($config['withAjax']) {
             // &ajaxResultsId - [ resource id | 0]
@@ -41,7 +41,7 @@ class AdvSearchForm extends AdvSearch {
      * @return string output as string
      */
     public function output() {
-        $jsHeaderArray = array();
+        $jsHeaderArray = [];
         $msg = '';
 
         // initialize searchString
@@ -53,7 +53,7 @@ class AdvSearchForm extends AdvSearch {
 
         // add the <div></div> section to set the results window throught jscript
         if ($this->config['withAjax']) {
-            $placeholders = array('asId' => $this->config['asId']);
+            $placeholders = ['asId' => $this->config['asId']];
             $resultsWindow = $this->processElementTags($this->parseTpl($this->config['resultsWindowTpl'], $placeholders));
         } else {
             $resultsWindow = '';
@@ -77,7 +77,7 @@ class AdvSearchForm extends AdvSearch {
         $this->config['uncacheScripts'] = $uncacheScripts ? '?_=' . time() : '';
 
         // display search form
-        $placeholders = array(
+        $placeholders = [
             'method' => $this->config['method'],
             'landing' => $this->config['landing'],
             'asId' => $this->config['asId'],
@@ -85,7 +85,7 @@ class AdvSearchForm extends AdvSearch {
             'searchParam' => $this->config['searchParam'],
             'liveSearch' => $this->config['liveSearch'] ? 1 : 0,
             'resultsWindow' => $resultsWindow
-        );
+        ];
 
         // &tpl [ chunk name | 'AdvSearchForm' ]
         $this->config['tpl'] = $this->modx->getOption('tpl', $this->config, 'AdvSearchForm');
@@ -182,7 +182,7 @@ class AdvSearchForm extends AdvSearch {
             $jsHeaderArray['useHistory'] = $this->config['useHistory'];
 
             // ajax connector
-            $jsHeaderArray['ajaxUrl'] = $this->modx->makeUrl($this->config['ajaxResultsId'], '', array(), $this->config['urlScheme']);
+            $jsHeaderArray['ajaxUrl'] = $this->modx->makeUrl($this->config['ajaxResultsId'], '', [], $this->config['urlScheme']);
 
             // &ajaxLoaderImageTpl - [ the chunk of spinning loader image. @FILE/@CODE/@INLINE[/@CHUNK] ]
             $ajaxLoaderImageTpl = $this->modx->getOption('ajaxLoaderImageTpl', $this->config, '@CODE <img src="' . $this->config['assetsUrl'] . 'js/images/indicator.white.gif' . '" alt="loading" />');

@@ -8,22 +8,22 @@
  *
  */
 
-$joined = array(
-    array(
-        'package' => 'modx', 
-        'class' => 'modUser', 
-        'packagePath' => '{core_path}/model/', 
-        'fields' => 'username ', 
+$joined = [
+    [
+        'package' => 'modx',
+        'class' => 'modUser',
+        'packagePath' => '{core_path}/model/',
+        'fields' => 'username ',
         'joinCriteria' => 'modUser.id = modResource.publishedby'
-    )
-);
+    ]
+];
 
 
 // set the query hook declaration
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2',       // version of queryHook - to manage futures changes
     'joined' => $joined
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 

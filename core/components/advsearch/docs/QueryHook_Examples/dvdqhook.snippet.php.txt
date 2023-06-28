@@ -18,28 +18,28 @@
 	and optionally (these parameters could be passed thru the snippet call):
 
     withFields - A comma-separated list of column names where to search.
-	fields - A comma-separated list of column names to display. 
+	fields - A comma-separated list of column names to display.
 	ids - A comma-separated list of primary keys to filter where the search should occurs.
     where - criteria or Array of criteria. e.g: "studio IN ('20th Century Fox','DreamWorks Home Ent.','Warner Bros') "
 	sortby - csv list of couple 'columnName (ASC| DESC)'.
 */
 
 
-$main = array(
+$main = [
     'package' => 'dvd',
     'packagePath' => '{core_path}components/dvd/model/',
     'class' => 'dvdProducts',
     'fields' => 'code , category_id , name , tags , price , weight , image , image_thmb , in_stock , enabled , studio , production_year , release_date , length, description', // displayed
     'withFields' => 'name , tags , studio , description', // where we do the search
 	'sortby' => 'dvdProducts.studio DESC, dvdProducts.name ASC'
-);
+];
 
 
 // set the query hook declaration
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2',       // version of queryHook - to manage futures changes
 	'main' => $main,
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 

@@ -11,28 +11,28 @@ if (!isset($gets['urlID']) || empty($gets['urlID']) || empty($tpl)) {
 $output = '';
 
 $c = $modx->newQuery(modResource::class);
-$c->select(array(
+$c->select([
     'modResource.*',
-));
+]);
 if (!empty($withTVs)) {
     $withTVsXpld = array_map('trim', @explode(',', $withTVs));
     foreach ($withTVsXpld as $tv) {
         $etv = $modx->escape($tv);
         $tvcv = $tv . '_cv';
         $etvcv = $modx->escape($tvcv);
-        $c->leftJoin('modTemplateVar', $tv, array(
+        $c->leftJoin('modTemplateVar', $tv, [
             "{$etv}.`name` = '{$tv}'"
-        ));
-        $c->leftJoin('modTemplateVarResource', $tv . '_cv', array(
+        ]);
+        $c->leftJoin('modTemplateVarResource', $tv . '_cv', [
             "{$etvcv}.`contentid` = `modResource`.`id`",
             "{$etvcv}.`tmplvarid` = {$etv}.`id`"
-        ));
+        ]);
         $c->select("IFNULL({$etvcv}.`value`, {$etv}.`default_text`) AS {$etv}");
     }
 }
-$c->where(array(
+$c->where([
     'modResource.id' => $gets['urlID']
-));
+]);
 
 $resource = $modx->getObject(modResource::class, $c);
 if (!$resource) {

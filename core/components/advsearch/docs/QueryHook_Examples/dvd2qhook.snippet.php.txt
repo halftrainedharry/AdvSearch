@@ -41,33 +41,33 @@
 
 // =================  As example a search inside "Science Fiction" Products with results ordered by genre and by name.
 
-$main = array(
+$main = [
     'package' => 'dvd',
     'packagePath' => '{core_path}components/dvd/model/',
     'class' => 'dvdProducts',
     'fields' => 'code , category_id , name , tags , price , weight , image , image_thmb , in_stock , enabled , studio , production_year , release_date , length, description', // displayed
     'withFields' => 'name , tags , studio , description', // where we do the search
 	'sortby' => 'dvdProducts.studio DESC, dvdProducts.name ASC'
-);
+];
 
-$joined = array(
-    array(
+$joined = [
+    [
         'package' => 'dvd',
         'class' => 'dvdCategories',
         'packagePath' => '{core_path}components/dvd/model/',
         'fields' => 'name , description',
         'withFields' => 'name , description',
         'joinCriteria' => 'dvdCategories.id = dvdProducts.category_id'
-    )
-);
+    ]
+];
 
-$andConditions = array(
+$andConditions = [
 	'dvdCategories.name:=' => 'ctg',
 	'dvdProducts.tags:=' => 'genre',
 	'dvdProducts.studio:=' => 'studio'
-);
+];
 
-$requests = array();
+$requests = [];
 
 // production year
 $tag = 'year';
@@ -108,13 +108,13 @@ if (!empty($price)) {
 }
 
 // set the query hook declaration
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2',       // version of queryHook - to manage futures changes
 	'main' => $main,
 	'joined' => $joined,
 	'andConditions' => $andConditions,
 	'requests' => $requests
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 

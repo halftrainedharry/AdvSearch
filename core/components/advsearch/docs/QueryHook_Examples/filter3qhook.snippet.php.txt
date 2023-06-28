@@ -8,15 +8,15 @@
  *
  */
 
-$andConditions = array(
+$andConditions = [
     'tv.articleCategory:=' => 'ctg:request:all',
     'tv.articleTags:REGEXP' => 'tag:request:all'
-);
+];
 
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2',
 	'andConditions' => $andConditions
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 return true;

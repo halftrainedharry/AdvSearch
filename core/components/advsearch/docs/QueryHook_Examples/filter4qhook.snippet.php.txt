@@ -10,9 +10,9 @@
 
 $perPage = 'ppage';
 
-$qhDeclaration = array(
+$qhDeclaration = [
 	'perPage' => $perPage
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 return true;

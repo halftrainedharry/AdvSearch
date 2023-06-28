@@ -8,9 +8,9 @@
  *
  */
 
-$qhDeclaration = array(
+$qhDeclaration = [
 	'sortby' => 'sort'	// ‘sort’ is the html tag name to catch the array of fields used to sort results
-);
+];
 
 $hook->setQueryHook($qhDeclaration);
 return true;

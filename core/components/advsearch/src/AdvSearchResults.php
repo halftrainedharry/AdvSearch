@@ -21,23 +21,23 @@ class AdvSearchResults extends AdvSearch {
 
     public $mainClass = modResource::class;
     public $primaryKey = 'id';
-    public $mainFields = array();
-    public $joinedFields = array();
-    public $tvFields = array();
+    public $mainFields = [];
+    public $joinedFields = [];
+    public $tvFields = [];
     public $resultsCount = 0;
-    public $results = array();
-    public $idResults = array();
+    public $results = [];
+    public $idResults = [];
     public $htmlResult = '';
     protected $page = 1;
     protected $queryHook = null;
-    protected $ids = array();
-    protected $sortby = array();
-    protected $mainWhereFields = array();
-    protected $joinedWhereFields = array();
-    protected $tvWhereFields = array();
+    protected $ids = [];
+    protected $sortby = [];
+    protected $mainWhereFields = [];
+    protected $joinedWhereFields = [];
+    protected $tvWhereFields = [];
     protected $driver;
 
-    public function __construct(modX &$modx, array &$config = array()) {
+    public function __construct(modX &$modx, array &$config = []) {
         //parent::__construct($modx, $config);
         // get time of starting
         $mtime = explode(" ", microtime());
@@ -208,7 +208,7 @@ class AdvSearchResults extends AdvSearch {
         if (!empty($this->queryHook['main']['fields'])) {
             $lstFields = $this->queryHook['main']['fields'];
         }
-        $fields = array();
+        $fields = [];
         if (!empty($lstFields)) {
             $fields = array_map('trim', explode(',', $lstFields));
         }
@@ -216,9 +216,9 @@ class AdvSearchResults extends AdvSearch {
 
         // initialise mainFields : 'id', 'template', 'context_key', 'createdon' + docFields for modResource
         if ($this->mainClass == modResource::class) {
-            $requiredFields = array('id', 'context_key');
+            $requiredFields = ['id', 'context_key'];
         } else {
-            $requiredFields = array($this->primaryKey);
+            $requiredFields = [$this->primaryKey];
         }
         $this->mainFields = array_merge($requiredFields, $fields);
 
@@ -298,13 +298,13 @@ class AdvSearchResults extends AdvSearch {
         }
 
         if (!empty($lstSortby)) {
-            $this->sortby = array();
+            $this->sortby = [];
             $sortCpls = array_map('trim', explode(',', $lstSortby));
             foreach ($sortCpls as $sortCpl) {
                 $sortElts = array_map('trim', explode(' ', $sortCpl));
                 $classField = !empty($sortElts[0]) ? $sortElts[0] : 'id';
                 $dir = strtolower((count($sortElts) < 2 || empty($sortElts[1])) ? 'desc' : $sortElts[1]);
-                $dir = in_array($dir, array('asc', 'desc')) ? $dir : 'desc';
+                $dir = in_array($dir, ['asc', 'desc']) ? $dir : 'desc';
                 $this->sortby[$classField] = $dir;
             }
         }
@@ -322,7 +322,7 @@ class AdvSearchResults extends AdvSearch {
      * @return string Returns search results output
      */
 
-    public function renderOutput($results = array()) {
+    public function renderOutput($results = []) {
         if (empty($results)) {
             return false;
         }
@@ -336,7 +336,7 @@ class AdvSearchResults extends AdvSearch {
 
         // results
         $resultsOutput = '';
-        $resultsArray = array();
+        $resultsArray = [];
         $idx = ($this->page - 1) * $this->config['perPage'] + 1;
         foreach ($results as $result) {
             if ($this->nbExtracts && count($this->extractFields)) {
@@ -370,10 +370,10 @@ class AdvSearchResults extends AdvSearch {
             $idx++;
         }
 
-        $resultsPh = array(
+        $resultsPh = [
             'paging' => $pagingOutput,
             'pagingType' => $this->config['pagingType'],
-        );
+        ];
         if ($this->config['toArray']) {
             $resultsPh['properties'] = $this->config;
             $resultsPh['results'] = $resultsArray;
@@ -532,7 +532,7 @@ class AdvSearchResults extends AdvSearch {
         $nbPages = (int) ceil($resultsCount / $this->config['perPage']);
         $flatCount = $this->page * $this->config['perPage'];
         $last = $flatCount <= $resultsCount ? $flatCount : $resultsCount;
-        $pagePh = array(
+        $pagePh = [
             'first' => ($this->page - 1) * $this->config['perPage'] + 1,
             'last' => $last,
             'total' => $resultsCount,
@@ -540,11 +540,11 @@ class AdvSearchResults extends AdvSearch {
             'page' => $this->page, // by convention
             'nbpages' => $nbPages,
             'totalPage' => $nbPages, // by convention
-        );
+        ];
 
         // $this->modx->setPlaceholders($pagePh, $this->config['placeholderPrefix']);
 
-        $qParameters = array();
+        $qParameters = [];
         if (!empty($this->queryHook['requests'])) {
             $qParameters = $this->queryHook['requests'];
         }
@@ -554,18 +554,18 @@ class AdvSearchResults extends AdvSearch {
             $previousCount = ($this->page - 1) * $this->config['perPage'];
             $pagePh['previouslink'] = '';
             if ($previousCount > 0) {
-                $parameters = array_merge($idParameters, $qParameters, array(
+                $parameters = array_merge($idParameters, $qParameters, [
                     $this->config['pageParam'] => $this->page - 1
-                ));
+                ]);
                 $pagePh['previouslink'] = $this->modx->makeUrl($id, '', $parameters, $this->config['urlScheme']);
             }
 
             $nextPage = ($this->page + 1);
             $pagePh['nextlink'] = '';
             if ($nextPage <= $nbPages) {
-                $parameters = array_merge($idParameters, $qParameters, array(
+                $parameters = array_merge($idParameters, $qParameters, [
                     $this->config['pageParam'] => $this->page + 1
-                ));
+                ]);
                 $pagePh['nextlink'] = $this->modx->makeUrl($id, '', $parameters, $this->config['urlScheme']);
             }
 
@@ -573,7 +573,7 @@ class AdvSearchResults extends AdvSearch {
             $output = $this->processElementTags($this->parseTpl($this->config['pagingTpl'], $pagePh));
         } elseif ($this->config['pagingType'] == 2) {
             // pagination type 2
-            $paging2 = array();
+            $paging2 = [];
             for ($i = 0; $i < $nbPages; ++$i) {
                 $pagePh['text'] = $i + 1;
                 $pagePh['separator'] = $this->config['pagingSeparator'];
@@ -583,9 +583,9 @@ class AdvSearchResults extends AdvSearch {
                     $pagePh = $this->cleanPlaceholders($pagePh);
                     $paging2[] = $this->processElementTags($this->parseTpl($this->config['currentPageTpl'], $pagePh));
                 } else {
-                    $parameters = array_merge($idParameters, $qParameters, array(
+                    $parameters = array_merge($idParameters, $qParameters, [
                         $this->config['pageParam'] => $pagePh['page']
-                    ));
+                    ]);
                     $pagePh['link'] = $this->modx->makeUrl($id, '', $parameters, $this->config['urlScheme']);
                     $pagePh = $this->cleanPlaceholders($pagePh);
                     $paging2[] = $this->processElementTags($this->parseTpl($this->config['pageTpl'], $pagePh));
@@ -596,23 +596,23 @@ class AdvSearchResults extends AdvSearch {
             $output = $this->processElementTags($this->parseTpl($this->config['pagingTpl'], $phs));
         } elseif ($this->config['pagingType'] == 3) {
             // pagination type 3
-            $paging3 = array();
+            $paging3 = [];
 
             $previousCount = ($this->page - 1) * $this->config['perPage'];
             $previouslink = '';
             if ($previousCount > 0) {
-                $parameters = array_merge($idParameters, $qParameters, array(
+                $parameters = array_merge($idParameters, $qParameters, [
                     $this->config['pageParam'] => $this->page - 1
-                ));
+                ]);
                 $previouslink = $this->modx->makeUrl($id, '', $parameters, $this->config['urlScheme']);
             }
 
             $nextPage = ($this->page + 1);
             $nextlink = '';
             if ($nextPage <= $nbPages) {
-                $parameters = array_merge($idParameters, $qParameters, array(
+                $parameters = array_merge($idParameters, $qParameters, [
                     $this->config['pageParam'] => $this->page + 1
-                ));
+                ]);
                 $nextlink = $this->modx->makeUrl($id, '', $parameters, $this->config['urlScheme']);
             }
 
@@ -661,8 +661,8 @@ class AdvSearchResults extends AdvSearch {
         return $output;
     }
 
-    private function _formatPaging3($idx, $docId, $parameters = array()) {
-        $pagePh = array();
+    private function _formatPaging3($idx, $docId, $parameters = []) {
+        $pagePh = [];
         $pagePh['text'] = $idx;
         $pagePh['separator'] = $this->config['pagingSeparator'];
         $pagePh['page'] = $idx;
@@ -672,9 +672,9 @@ class AdvSearchResults extends AdvSearch {
             $pagePh = $this->cleanPlaceholders($pagePh);
             $output = $this->processElementTags($this->parseTpl($this->config['currentPageTpl'], $pagePh));
         } else {
-            $parameters = array_merge($parameters, array(
+            $parameters = array_merge($parameters, [
                 $this->config['pageParam'] => $idx
-            ));
+            ]);
             $pagePh['link'] = $this->modx->makeUrl($docId, '', $parameters, $this->config['urlScheme']);
             $pagePh = $this->cleanPlaceholders($pagePh);
             $output = $this->processElementTags($this->parseTpl($this->config['pageTpl'], $pagePh));
@@ -699,7 +699,7 @@ class AdvSearchResults extends AdvSearch {
      *      a lucene regexp expression using ? or *
      */
 
-    private function _getExtracts($text, $nbext = 1, $extractLength = 200, $searchTerms = array(), $tpl = '', $ellipsis = '...') {
+    private function _getExtracts($text, $nbext = 1, $extractLength = 200, $searchTerms = [], $tpl = '', $ellipsis = '...') {
 
         mb_internal_encoding($this->config['charset']); // set internal encoding to UTF-8 for multi-bytes functions
 
@@ -724,13 +724,13 @@ class AdvSearchResults extends AdvSearch {
             } else {
                 $intro = '';
             }
-            $phs = $this->cleanPlaceholders(array('extract' => $intro));
+            $phs = $this->cleanPlaceholders(['extract' => $intro]);
 
             return $this->processElementTags($this->parseTpl($tpl, $phs));
         }
 
         // get extracts
-        $extracts = array();
+        $extracts = [];
         $extractLength2 = $extractLength / 2;
         $rank = 0;
 
@@ -744,11 +744,11 @@ class AdvSearchResults extends AdvSearch {
         foreach ($searchTerms as $searchTerm) {
             $rank++;
             // replace lucene wildcards by regexp wildcards
-            $pattern = array('#\*#', '#\?#');
-            $replacement = array('\w*', '\w');
+            $pattern = ['#\*#', '#\?#'];
+            $replacement = ['\w*', '\w'];
             $searchTerm = preg_replace($pattern, $replacement, $searchTerm);
             $pattern = '#' . $searchTerm . '#i';
-            $matches = array();
+            $matches = [];
             $nbr = preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE);
 
             for ($i = 0; $i < $nbr && $i < $nbext; $i++) {
@@ -765,7 +765,7 @@ class AdvSearchResults extends AdvSearch {
                 if ($right > $textLength) {
                     $right = $textLength;
                 }
-                $extracts[] = array(
+                $extracts[] = [
                     'searchTerm' => $term,
                     'wordLeft' => $wordLeft,
                     'wordRight' => $wordRight,
@@ -774,7 +774,7 @@ class AdvSearchResults extends AdvSearch {
                     'right' => $right,
                     'etcLeft' => $ellipsis,
                     'etcRight' => $ellipsis
-                );
+                ];
             }
         }
 
@@ -827,9 +827,9 @@ class AdvSearchResults extends AdvSearch {
                 $searchTerm = $extracts[$i]['searchTerm'];
                 $extract = $this->addHighlighting($extract, (array) $searchTerm, $highlightClass, $highlightTag, $rank);
             }
-            $extractPh = array(
+            $extractPh = [
                 'extract' => $extracts[$i]['etcLeft'] . $extract . $extracts[$i]['etcRight']
-            );
+            ];
             $extractPh = $this->cleanPlaceholders($extractPh);
             $output .= $this->processElementTags($this->parseTpl($tpl, $extractPh));
         }

@@ -21,13 +21,13 @@ class AdvSearchHooks {
      * @var array $errors A collection of all the processed errors so far.
      * @access public
      */
-    public $errors = array();
+    public $errors = [];
 
     /**
      * @var array $hooks A collection of all the processed hooks so far.
      * @access public
      */
-    public $hooks = array();
+    public $hooks = [];
 
     /**
      * @var modX $modx A reference to the modX instance.
@@ -51,11 +51,10 @@ class AdvSearchHooks {
      * @param array $config Optional. An array of configuration parameters.
      * @return asHooks
      */
-    public function __construct(AdvSearch &$search, array $config = array()) {
+    public function __construct(AdvSearch &$search, array $config = []) {
         $this->search = &$search;
         $this->modx = &$search->modx;
-        $this->config = array_merge(array(
-                ), $config);
+        $this->config = array_merge([], $config);
     }
 
     /**
@@ -67,22 +66,22 @@ class AdvSearchHooks {
      * @param array $hookProperties An array of extra properties for each hook
      * @return mixed
      */
-    public function loadMultiple($hooks, array $commonProperties = array(), array $hookProperties = array()) {
+    public function loadMultiple($hooks, array $commonProperties = [], array $hookProperties = []) {
         if (empty($hooks)) {
-            return array();
+            return [];
         }
         if (is_string($hooks)) {
             $hooks = @explode(',', $hooks);
         }
 
-        $this->hooks = array();
+        $this->hooks = [];
         $ih = 0;
         foreach ($hooks as $hook) {
             $hook = trim($hook);
             $properties = $commonProperties;
             foreach ($hookProperties as $propertyName => $propertyVal) {
                 $propertyArrayVal = array_map('trim', explode(',', $propertyVal));
-                $properties = array_merge($properties, array($propertyName => $propertyArrayVal[$ih]));
+                $properties = array_merge($properties, [$propertyName => $propertyArrayVal[$ih]]);
             }
             $success = $this->load($hook, $properties);
             if (!$success) {
@@ -102,15 +101,15 @@ class AdvSearchHooks {
      * @param array $customProperties Any other custom properties to load into a custom hook.
      * @return boolean True if hook was successful.
      */
-    public function load($hook, array $customProperties = array()) {
+    public function load($hook, array $customProperties = []) {
         $success = false;
         $this->hooks[] = $hook;
 
-        $reserved = array('load', 'process', '__construct', 'getErrorMessage');
+        $reserved = ['load', 'process', '__construct', 'getErrorMessage'];
         if (method_exists($this, $hook) && !in_array($hook, $reserved)) {
             /* built-in hooks */
             $success = $this->$hook();
-        } else if ($snippet = $this->modx->getObject('modSnippet', array('name' => $hook))) {
+        } else if ($snippet = $this->modx->getObject('modSnippet', ['name' => $hook])) {
             /* custom snippet hook */
             $properties = array_merge($this->search->config, $customProperties);
             $properties['advsearch'] = &$this->search;
@@ -162,7 +161,7 @@ class AdvSearchHooks {
         if (isset($_REQUEST['asform'])) {
             $asform = strip_tags($_REQUEST['asform']);
             $formParams = json_decode($asform);
-            $excluded = array('id', 'asid', 'sub');
+            $excluded = ['id', 'asid', 'sub'];
             $excluded[] = $this->search->config['searchParam'];
             $excluded[] = $this->search->config['pageParam'];
             foreach ($formParams as $key => $val) {
@@ -170,7 +169,7 @@ class AdvSearchHooks {
                 if (!(in_array($key, $excluded))) {
                     if (is_array($val)) {
                         if (!isset($_REQUEST[$key])) {
-                            $_REQUEST[$key] = array();
+                            $_REQUEST[$key] = [];
                             foreach ($val as $v) {
                                 $_REQUEST[$key][] = strip_tags($v);
                             }
@@ -192,7 +191,7 @@ class AdvSearchHooks {
                 case 'IN':
                 case 'NOT IN':  // operator with a list of values wrapped by parenthesis
                     $lstval = explode(',', $val);
-                    $arrayVal = array();
+                    $arrayVal = [];
                     foreach ($lstval as $v) {
                         if (is_numeric($val)) {
                             $arrayVal[] = $v;
@@ -234,7 +233,7 @@ class AdvSearchHooks {
                 case 'IN':
                 case 'NOT IN':  // operator with a list of values wrapped by parenthesis
                     $lstval = explode(',', $val);
-                    $arrayVal = array();
+                    $arrayVal = [];
                     foreach ($lstval as $v) {
                         if (is_numeric($val)) {
                             $arrayVal[] = $v;
@@ -295,7 +294,7 @@ class AdvSearchHooks {
     }
 
     public function processConditions($andConditions, & $requests) {
-        $conditions = array();
+        $conditions = [];
 
         foreach ($andConditions as $keyCondition => $valueCondition) {
             $keyElts = array_map("trim", @explode(':', $keyCondition));
@@ -330,19 +329,19 @@ class AdvSearchHooks {
             if (is_array($valueCondition)) {
                 $tag = isset($valueCondition['key']) && !empty($valueCondition['key']) ? $valueCondition['key'] : '';
                 $typeValue = (!empty($valueCondition['method'])) ? strtolower($valueCondition['method']) : 'request';
-                $filtered = (!empty($valueCondition['ignoredValue'])) ? array_map("trim", @explode(',', $valueCondition['ignoredValue'])) : array();
+                $filtered = (!empty($valueCondition['ignoredValue'])) ? array_map("trim", @explode(',', $valueCondition['ignoredValue'])) : [];
             } else {
                 $valueElts = array_map("trim", @explode(':', $valueCondition));
                 $tag = $valueElts[0];
                 $typeValue = (!empty($valueElts[1])) ? strtolower($valueElts[1]) : 'request';
-                $filtered = (!empty($valueElts[2])) ? array_map("trim", explode(',', $valueElts[2])) : array();
+                $filtered = (!empty($valueElts[2])) ? array_map("trim", explode(',', $valueElts[2])) : [];
             }
 
             if ($typeValue == 'request' && !empty($tag) && isset($_REQUEST[$tag])) { // the value is provided par an http variable
                 if (is_array($_REQUEST[$tag])) {
                     // multiple list
                     $values = $_REQUEST[$tag];
-                    $orConditions = array();
+                    $orConditions = [];
                     foreach ($values as $val) {
                         $val = strip_tags($val);
                         if (($val != '') && !in_array($val, $filtered)) {
@@ -391,7 +390,7 @@ class AdvSearchHooks {
      * @return type
      */
     public function processConditionsDeprecated($andConditions, & $requests) {
-        $conditions = array();
+        $conditions = [];
         foreach ($andConditions as $keyCondition => $valueCondition) {
             $keyElts = array_map("trim", explode(':', $keyCondition));
             if (count($keyElts) == 1) {
@@ -427,14 +426,14 @@ class AdvSearchHooks {
             $valueElts = array_map("trim", explode(':', $valueCondition));
             $tag = $valueElts[0];
             $typeValue = (!empty($valueElts[1])) ? strtolower($valueElts[1]) : 'request';
-            $filtered = (!empty($valueElts[2])) ? array_map("trim", explode(',', $valueElts[2])) : array();
+            $filtered = (!empty($valueElts[2])) ? array_map("trim", explode(',', $valueElts[2])) : [];
 
             if ($typeValue == 'request') { // the value is provided par an http variable
                 if (isset($_REQUEST[$tag])) {
                     if (is_array($_REQUEST[$tag])) {
                         // multiple list
                         $values = $_REQUEST[$tag];
-                        $orConditions = array();
+                        $orConditions = [];
                         foreach ($values as $val) {
                             $val = strip_tags($val);
                             if (($val != '') && !in_array($val, $filtered)) {
@@ -479,7 +478,7 @@ class AdvSearchHooks {
 
     // ============================================================== function available from queryHook
 
-    public function setQueryHook(array $qhDeclaration = array()) {
+    public function setQueryHook(array $qhDeclaration = []) {
         $requests = null;
 
         if (!empty($qhDeclaration)) {
@@ -542,7 +541,7 @@ class AdvSearchHooks {
                 if (is_array($_REQUEST[$tag])) {
                     // multiple list
                     $values = $_REQUEST[$tag];
-                    $vals = array();
+                    $vals = [];
                     foreach ($values as $val) {
                         if (!empty($val)) {
                             $vals[] = strip_tags($val);
@@ -582,7 +581,7 @@ class AdvSearchHooks {
      * @param array $placeholders An array of placeholders to replace with values
      * @return string The parsed string
      */
-    public function process($str, array $placeholders = array()) {
+    public function process($str, array $placeholders = []) {
         foreach ($placeholders as $k => $v) {
             $str = str_replace('[[+' . $k . ']]', $v, $str);
         }

@@ -3,7 +3,7 @@
   - [Declaration syntaxes - andConditions](#declaration-syntaxes---andconditions)
     - [Example 1 – Filter1 - andConditions](#example-1--filter1---andconditions)
     - [Example 2 – Filter2 - andConditions](#example-2--filter2---andconditions)
-    - [Example 3 – Dvd Shop – andConditions & requests](#example-3--dvd-shop--andconditions--requests)
+    - [Example 3 – Dvd Shop – andConditions \& requests](#example-3--dvd-shop--andconditions--requests)
     - [andConditions - Much more ...](#andconditions---much-more-)
       - [custom class instead of tv](#custom-class-instead-of-tv)
       - [Compare with constant values (numeric)](#compare-with-constant-values-numeric)
@@ -44,10 +44,10 @@ The structure of the query Hook is always:
 ```php
 <?php
 //... Some declarations ...
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2',
     //... some declarations ...
-);
+];
 $hook->setQueryHook($qhDeclaration);
 return true;
 ```
@@ -77,13 +77,13 @@ The possible declarations are:
 A andCondition declaration is writted as follow:
 
 ```php
-$andConditions = array(
+$andConditions = [
     'class.field:operator:pattern' => 'value:typeOfValue:filteredValues'
-);
-$qhDeclaration = array(
+];
+$qhDeclaration = [
     'qhVersion' => '1.2'
     'andConditions' => $andConditions
-);
+];
 ```
 
 The **key** of a condition element is be as **'class.field:operator:pattern'**
@@ -194,14 +194,14 @@ To implement the search with filtering by a category and tags we write the andCo
 
 ```php
 <?php
-$andConditions = array(
+$andConditions = [
     'tv.articleCategory:=' => 'ctg:request:all',
     'tv.articleTags:MATCH' => 'tag:request:all',
-);
-$qhDeclaration = array(
+];
+$qhDeclaration = [
     'qhVersion' => '1.2'
     'andConditions' => $andConditions
-);
+];
 $hook->setQueryHook($qhDeclaration);
 return true;
 ```
@@ -306,15 +306,15 @@ To do this, we create a snippet named 'Filter2Qhook' with the following content:
 
 ```php
 <?php
-$andConditions = array(
+$andConditions = [
     'tv.articleCategory:REGEXP' => 'ctg:request:all',
     'tv.articleMark:>=' => 'minf:request:none',
     'tv.articleMark:<=' => 'msup:request:none'
-);
-$qhDeclaration = array(
+];
+$qhDeclaration = [
     'qhVersion' => '1.2'
     'andConditions' => $andConditions
-);
+];
 $hook->setQueryHook($qhDeclaration);
 return true;
 ```
@@ -425,11 +425,11 @@ With as content for the chunk 'dvd2SearchForm':
 In this example, the tags 'ctg', 'genre' and 'studio' are classical an they could be treated easily with:
 
 ```php
-$andConditions = array(
+$andConditions = [
     'dvdCategories.name:=' => 'ctg',
     'dvdProducts.tags:=' => 'genre',
     'dvdProducts.studio:=' => 'studio'
-);
+];
 ```
 
 But for the tags 'year' and 'price', the life is not so easy...
@@ -603,10 +603,10 @@ To catch and manage the 'ppage' html tag we write the following queryHook (named
 ```php
 <?php
 $perPage = 'ppage'; // 'ppage' is the html tag name used to catch the number of results to display
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2'
     'perPage ' => $perPage
-);
+];
 $hook->setQueryHook($qhDeclaration);
 return true;
 ```
@@ -664,10 +664,10 @@ To catch and manage the 'sort' html tag we write the following queryHook (named 
 ```php
 <?php
 $sortby = 'sort'; // 'sort' is the html tag name to catch the array of fields used to sort results
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2'
     'sortby ' => $sortby
-);
+];
 $hook->setQueryHook($qhDeclaration);
 return true;
 ```
@@ -699,23 +699,23 @@ and optionally (these parameters could be passed thru the snippet call):
 As example for the dvdProduct class we write:
 
 ```php
-$main = array(
+$main = [
     'package' => 'dvd',
     'packagePath' => '{core_path}components/dvd/model/',
     'class' => 'dvdProducts',
     'fields' => 'code,category_id,name,tags,price,weight,image,image_thmb,in_stock,studio,production_year,length,description',
     'withFields' => 'name,tags,studio,description', // where we do the search
     'sortby' => 'dvdProducts.studio DESC,dvdProducts.name ASC'
-);
+];
 ```
 
 And we simply add the 'main' declaration with:
 
 ```php
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2', // version of queryHook - to manage futures changes
     'main' => $main,
-);
+];
 ```
 
 Some remarks:
@@ -769,23 +769,23 @@ and optionally:
 As example for the dvdCategories class is writted as follow:
 
 ```php
-$joined = array(
-    array(
+$joined = [
+    [
         'package' => 'dvd',
         'class' => 'dvdCategories',
         'packagePath' => '{core_path}components/dvd/model/',
         'fields' => 'name,description',
         'withFields' => 'name,description',
         'joinCriteria' => 'dvdCategories.id = dvdProducts.category_id'
-        )
-);
+    ]
+];
 ```
 
 And we simply add the 'joined' declaration with:
 
 ```php
-$qhDeclaration = array(
+$qhDeclaration = [
     'qhVersion' => '1.2',
     'joined' => $joined,
-);
+];
 ```

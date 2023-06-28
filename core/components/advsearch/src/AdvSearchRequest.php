@@ -23,12 +23,12 @@ class AdvSearchRequest extends AdvSearch {
     public $searchResults = null;
     protected $page = 1;
     protected $queryHook = null;
-    protected $displayedFields = array();
-    protected $extractFields = array();
+    protected $displayedFields = [];
+    protected $extractFields = [];
     protected $nbExtracts;
     protected $asr = null;
 
-    public function __construct(modX &$modx, array $config = array()) {
+    public function __construct(modX &$modx, array $config = []) {
         parent::__construct($modx, $config);
     }
 
@@ -76,7 +76,7 @@ class AdvSearchRequest extends AdvSearch {
         // &postHookTpls [ A comma-separated list of templates for the postHook | '' ]
         // a list of templates used by the postHook to style the postHooked result
         $postHookTplsLst = $this->modx->getOption('postHookTpls', $this->config, '');
-        $postHookTpls = (!empty($postHookTplsLst)) ? array_map('trim', explode(',', $postHookTplsLst)) : array();
+        $postHookTpls = (!empty($postHookTplsLst)) ? array_map('trim', explode(',', $postHookTplsLst)) : [];
         $this->config['postHookTpls'] = implode(',', $postHookTpls);
 
         $this->_initSearchString();
@@ -89,12 +89,12 @@ class AdvSearchRequest extends AdvSearch {
         if (isset($queryHook['perPage']) && !empty($queryHook['perPage'])) {
             $this->config['perPage'] = $queryHook['perPage'];
         }
-        $asContext = array(
+        $asContext = [
             'searchString' => $this->searchString,
             'searchTerms' => $this->searchTerms,
             'page' => $this->page,
             'queryHook' => $queryHook
-        );
+        ];
 
         $doQuery = true;
         // Abort if there are errors
@@ -110,7 +110,7 @@ class AdvSearchRequest extends AdvSearch {
         if ($this->config['cacheQuery'] && $doQuery) {
             $key = serialize(array_merge($this->config, $asContext));
             $hash = md5($key);
-            $cacheOptions = array(xPDO::OPT_CACHE_KEY => 'advsearch');
+            $cacheOptions = [xPDO::OPT_CACHE_KEY => 'advsearch'];
             $foundCached = $this->modx->cacheManager->get($hash, $cacheOptions);
             if ($foundCached) {
                 $doQuery = false;
@@ -131,7 +131,7 @@ class AdvSearchRequest extends AdvSearch {
 
             // display results
             $outputType = $this->config['output'];
-            $out = array();
+            $out = [];
             foreach ($outputType as $to) {
                 if ($to == 'html') {
                     if ($outputCount) {
@@ -162,10 +162,10 @@ class AdvSearchRequest extends AdvSearch {
             }
 
             if ($this->config['cacheQuery'] && $outputCount > 0 && !empty($output)) {
-                $cache = array(
+                $cache = [
                     'results' => $output,
                     'resultsCount' => $outputCount,
-                );
+                ];
                 $this->modx->cacheManager->set($hash, $cache, $this->config['cacheTime'], $cacheOptions);
             }
         } // if ($doQuery)
@@ -175,13 +175,13 @@ class AdvSearchRequest extends AdvSearch {
 
         // set global placeholders
         // query: search term entered by user, total: number of results, etime: elapsed time
-        $placeholders = array(
+        $placeholders = [
             'resultInfo' => $this->_getResultInfo($outputCount),
             // 'moreResults' => $this->_getMoreLink(),
             'query' => htmlspecialchars($this->searchString),
             'total' => $outputCount,
             'etime' => $this->getElapsedTime(),
-        );
+        ];
         $this->modx->toPlaceholders($placeholders, $this->config['placeholderPrefix']);
 
         if (!empty($this->config['toPlaceholder'])) {
@@ -215,10 +215,10 @@ class AdvSearchRequest extends AdvSearch {
         $this->searchString = $searchString;
 
         if (empty($searchString) && !($this->config['init'] === 'all')) {
-            $msgerr = $this->modx->lexicon('advsearch.minchars', array(
+            $msgerr = $this->modx->lexicon('advsearch.minchars', [
                 'minterm' => '',
                 'minchars' => $this->config['minChars']
-            ));
+            ]);
             $this->setError($msgerr);
 
             return false;
@@ -237,9 +237,9 @@ class AdvSearchRequest extends AdvSearch {
         }
 
         if (count($this->searchTerms) > $this->config['maxWords']) {
-            $msgerr = $this->modx->lexicon('advsearch.maxwords', array(
+            $msgerr = $this->modx->lexicon('advsearch.maxwords', [
                 'maxwords' => $this->config['maxWords']
-            ));
+            ]);
             $this->setError($msgerr);
 
             return false;
@@ -276,21 +276,21 @@ class AdvSearchRequest extends AdvSearch {
         $asHooks = new AdvSearchHooks($this);
         if (!empty($asHooks)) {
             if ($type === 'queryHook') {
-                $asHooks->loadMultiple($this->config[$type], array(), array(
+                $asHooks->loadMultiple($this->config[$type], [], [
                     'hooks' => $this->config[$type],
                     'searchString' => $this->searchString
-                ));
+                ]);
                 $this->queryHook = $asHooks->queryHook;
                 $this->ifDebug('QueryHook: ' . print_r($this->queryHook, true), __METHOD__, __FILE__, __LINE__);
 
                 return $this->queryHook;
             } elseif ($type === 'postHook') {
-                $asHooks->loadMultiple($this->config[$type], array(
+                $asHooks->loadMultiple($this->config[$type], [
                     'hooks' => $this->config[$type],
                     'page' => $this->page,
                     'perPage' => $this->config['perPage'],
                     'postHookTpls' => $this->config['postHookTpls']
-                ));
+                ]);
                 $this->searchResults = $asHooks->postHook;
                 $this->ifDebug('PostHook: ' . print_r($asHooks->postHook, true), __METHOD__, __FILE__, __LINE__);
 
@@ -318,19 +318,19 @@ class AdvSearchRequest extends AdvSearch {
             } else {
                 $lexicon = 'advsearch.results_text_found_singular';
             }
-            $output = $this->modx->lexicon($lexicon, array(
+            $output = $this->modx->lexicon($lexicon, [
                 'count' => $resultsCount,
                 'text' => !empty($this->config['highlightResults']) ? $this->addHighlighting($this->searchString, $this->searchTerms, $this->config['highlightClass'], $this->config['highlightTag']) : $this->searchString
-            ));
+            ]);
         } else {
             if ($resultsCount > 1) {
                 $lexicon = 'advsearch.results_found_plural';
             } else {
                 $lexicon = 'advsearch.results_found_singular';
             }
-            $output = $this->modx->lexicon($lexicon, array(
+            $output = $this->modx->lexicon($lexicon, [
                 'count' => $resultsCount
-            ));
+            ]);
         }
 
         return $output;
@@ -350,16 +350,16 @@ class AdvSearchRequest extends AdvSearch {
         $output = '';
         if ($this->config['moreResults']) {
             $idParameters = $this->modx->request->getParameters();
-            $qParameters = array();
+            $qParameters = [];
             if (!empty($this->queryHook['requests'])) {
                 $qParameters = $this->queryHook['requests'];
             }
             $parameters = array_merge($idParameters, $qParameters);
             $id = $this->config['moreResults'];
-            $linkPh = array(
+            $linkPh = [
                 'asId' => $this->config['asId'],
                 'moreLink' => $this->modx->makeUrl($id, '', $parameters, $this->config['urlScheme'])
-            );
+            ];
             $output = $this->processElementTags($this->parseTpl($this->config['moreResultsTpl'], $linkPh));
         }
         return $output;

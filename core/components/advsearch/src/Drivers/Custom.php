@@ -32,7 +32,7 @@ class Custom extends Base {
         $c = $this->addJoinedResources($c, $asContext);
         $fields = array_merge((array) $asContext['mainFields'], (array)$asContext['joinedFields']);
         if (!in_array('id', $fields)) {
-            $fields = array_merge(array('id'), $fields);
+            $fields = array_merge(['id'], $fields);
         }
         // initialize and add main displayed fields
         $c->distinct();
@@ -40,13 +40,13 @@ class Custom extends Base {
 
         // restrict search to specific keys ($lstIds)
         if (!empty($this->config['ids'])) {
-            $c->andCondition(array("{$this->mainClass}.{$this->primaryKey} IN (" . $this->config['ids'] . ")"));
+            $c->andCondition(["{$this->mainClass}.{$this->primaryKey} IN (" . $this->config['ids'] . ")"]);
         }
 
         // restrict search with where condition
         if (!empty($main['where'])) {
             if (!is_array($main['where'])) {
-                $c->andCondition(array($main['where']));
+                $c->andCondition([$main['where']]);
             } else {
                 $c->andCondition($main['where']);
             }

@@ -12,24 +12,24 @@ abstract class Base extends AdvSearch {
     public $config;
     public $mainClass = modResource::class;
     public $primaryKey = 'id';
-    public $mainFields = array();
-    public $joinedFields = array();
-    public $tvFields = array();
+    public $mainFields = [];
+    public $joinedFields = [];
+    public $tvFields = [];
     public $resultsCount = 0;
-    public $results = array();
-    public $idResults = array();
+    public $results = [];
+    public $idResults = [];
     public $searchString;
-    public $searchTerms = array();
+    public $searchTerms = [];
     public $limit;
     protected $page = 1;
     protected $queryHook = null;
-    protected $ids = array();
-    // protected $sortbyClass = array();
-    // protected $sortbyField = array();
-    // protected $sortbyDir = array();
-    protected $mainWhereFields = array();
-    protected $joinedWhereFields = array();
-    protected $tvWhereFields = array();
+    protected $ids = [];
+    // protected $sortbyClass = [];
+    // protected $sortbyField = [];
+    // protected $sortbyDir = [];
+    protected $mainWhereFields = [];
+    protected $joinedWhereFields = [];
+    protected $tvWhereFields = [];
 
     public function __construct(modX $modx, $config) {
         $this->modx = &$modx;
@@ -128,7 +128,7 @@ abstract class Base extends AdvSearch {
                 // restrict search with a where condition on joined resource
                 if (!empty($joined['where'])) {
                     if (!is_array($joined['where'])) {
-                        $c->andCondition(array($joined['where']));
+                        $c->andCondition([$joined['where']]);
                     } else {
                         $c->andCondition($joined['where']);
                     }
