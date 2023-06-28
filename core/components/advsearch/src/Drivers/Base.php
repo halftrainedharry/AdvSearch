@@ -32,7 +32,7 @@ abstract class Base extends AdvSearch {
     protected $tvWhereFields = array();
 
     public function __construct(modX $modx, $config) {
-        $this->modx = & $modx;
+        $this->modx = &$modx;
         $this->config = $config;
 
         // increase the execution time of the script
@@ -77,7 +77,7 @@ abstract class Base extends AdvSearch {
      * @param xPDOQuery $c query in construction
      * @return xPDOQuery $c updated query
      */
-    protected function addJoinedResources(xPDOQuery & $c, $asContext) {
+    protected function addJoinedResources(xPDOQuery &$c, $asContext) {
         if (empty($asContext['queryHook']['joined'])) {
             return $c;
         }
@@ -107,13 +107,13 @@ abstract class Base extends AdvSearch {
                 }
 
                 $joinedAlias = isset($joined['alias']) ? $joined['alias'] : $joinedClass;
-                foreach ($joinedWhereFields as & $joinedWhereField) {
+                foreach ($joinedWhereFields as &$joinedWhereField) {
                     $joinedWhereField = $this->modx->escape($joinedAlias) . '.' . $this->modx->escape($joinedWhereField);
                 }
                 $this->joinedWhereFields = array_merge($this->joinedWhereFields, $joinedWhereFields);
                 // add joined fields
                 $c->select($this->modx->getSelectColumns($joinedClass, $joinedAlias, "{$joinedAlias}_", $joinedFields));
-                foreach ($joinedFields as & $joinedField) {
+                foreach ($joinedFields as &$joinedField) {
                     $joinedField = "{$joinedAlias}_{$joinedField}"; // all the fields of joined class are prefixed by classname_
                 }
                 $this->joinedFields = array_merge($this->joinedFields, $joinedFields);

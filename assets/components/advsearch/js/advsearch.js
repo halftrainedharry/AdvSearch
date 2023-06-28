@@ -85,7 +85,7 @@ jQuery(function($) {
 
                     google.maps.event.addListener(marker, 'click', function(event) {
                         $.ajax({
-                            url: as.gmpWin,
+                            url: as.mapUrl,
                             cache: false,
                             data: {
                                 urlID: item['urlID']
@@ -173,133 +173,128 @@ jQuery(function($) {
     function activateSearch(opt) {
         // Each advsearch instance has its own index ias
         for (var ias = 0; ias < advsea.length; ias++) {
-            var asv = eval('(' + advsea[ias] + ')');
-            if (opt && opt.hstx) {
-                asv.hstx = opt.hstx;
+            var asv = JSON.parse(advsea[ias]);
+            if (opt && opt.isHistoryEvent) {
+                asv.isHistoryEvent = opt.isHistoryEvent;
             }
             activateAsInstance(asv);
         }
     }
 
     function activateAsInstance(as) {
-        if (!as.arh) {
-            return false; // empty ajax holder
+        if (!as.ajaxUrl) {
+            return false; // no AJAX endpoint defined to get the results from
         }
 
         // as.asid : advsearch instance id
-        // as.arh  : ajax results holder
-        // as.cdt  : clear default text
 
-        if (!as.ls) {
+        if (!as.liveSearch) {
             // live search off by default
-            as.ls = 0;
+            as.liveSearch = 0;
         }
-        if (!as.ii) {
+        if (!as.init) {
             // initial display
-            as.ii = 'none';
+            as.init = 'none';
         }
-        if (!as.mc) {
+        if (!as.minChars) {
             // min chars
-            as.mc = _minChars;
+            as.minChars = _minChars;
         }
-        if (!as.sx) {
+        if (!as.searchParam) {
             // search index
-            as.sx = 'search';
+            as.searchParam = 'search';
         }
-        if (!as.pax) {
+        if (!as.pageParam) {
             // page index
-            as.pax = 'page';
+            as.pageParam = 'page';
         }
 
-        as.lt = null;   // livesearch timeout
-        as.is = false;  // is searching flag
+        as.liveSearchTimeout = null;   // livesearch timeout
+        as.isSearching = false;  // is searching flag
 
-        var p = as.asid + '_';
-        as.px = p; //advsearch instance prefix
+        var prefix = as.asid + '_';
+        as.prefix = prefix; //advsearch instance prefix
 
-        as.si = $('#' + p + 'advsea-search');   // advsearch input field
-        as.si.unbind();  // detach existing function if any
-        var ref = as.si;
+        as.searchField = $('#' + prefix + 'advsea-search');   // advsearch input field
+        as.searchField.unbind();  // detach existing function if any
+        var ref = as.searchField;
 
-        as.se = $('#' + p + 'advsea-select');   // select input field if it exists
-        as.se.unbind();  // detach existing function if any
-        as.sb = "Search";
-        if (!as.ls) {
-            as.ss = $('#' + p + 'advsea-submit');  // advsearch submit button if it exists
-            as.ss.unbind();  // detach existing function if any
-            as.sb = as.ss.attr('value');
-            ref = as.ss;
+        as.selectField = $('#' + prefix + 'advsea-select');   // select input field if it exists
+        as.selectField.unbind();  // detach existing function if any
+        as.submitButtonVal = "Search";
+        if (!as.liveSearch) {
+            as.submitButton = $('#' + prefix + 'advsea-submit');  // advsearch submit button if it exists
+            as.submitButton.unbind();  // detach existing function if any
+            as.submitButtonVal = as.submitButton.attr('value');
+            ref = as.submitButton;
         }
 
         $('.advsea-close-img').each(function() {
             $(this).remove();
         });
-        if (as.acii && $('#' + as.acii)[0]) {
-            as.cl = $(as.aci).addClass('advsea-close-img').hide(); // advsearch close img
-            $('#' + as.acii).html(as.cl);
+        if (as.closeImgId && $('#' + as.closeImgId)[0]) {
+            as.closeImgEl = $(as.closeImg).addClass('advsea-close-img').hide(); // advsearch close img
+            $('#' + as.closeImgId).html(as.closeImgEl);
         } else {
-            as.cl = $(as.aci).addClass('advsea-close-img').insertAfter(ref).hide(); // advsearch close img
+            as.closeImgEl = $(as.closeImg).addClass('advsea-close-img').insertAfter(ref).hide(); // advsearch close img
         }
         $('.advsea-load-img').each(function() {
             $(this).remove();
         });
-        if (as.alii && $('#' + as.alii)[0]) {
-            as.ld = $(as.ali).addClass('advsea-load-img').hide(); // advsearch load img
-            $('#' + as.alii).html(as.ld);
+        if (as.loadImgId && $('#' + as.loadImgId)[0]) {
+            as.loadImgEl = $(as.loadImg).addClass('advsea-load-img').hide(); // advsearch load img
+            $('#' + as.loadImgId).html(as.loadImgEl);
         } else {
-            as.ld = $(as.ali).addClass('advsea-load-img').insertAfter(ref).hide(); // advsearch load img
+            as.loadImgEl = $(as.loadImg).addClass('advsea-load-img').insertAfter(ref).hide(); // advsearch load img
         }
 
-        as.rw = $('#' + p + 'advsea-reswin').hide().removeClass('init'); // advsearch results window - hide window
+        as.resultEl = $('#' + prefix + 'advsea-reswin').hide().removeClass('init'); // advsearch results window - hide window
 
-        as.cl.unbind();  // detach existing function if any
-        as.cl.click(function(event) {
+        as.closeImgEl.unbind();  // detach existing function if any
+        as.closeImgEl.click(function(event) {
             (event.preventDefault) ? event.preventDefault() : (event.returnValue = false);
             // adds the closeSearch function to the on click on close image.
             closeSearch(as);
             return false;
         });
 
-        if (!as.ls) {
+        if (!as.liveSearch) {
             // with non livesearch adds the doSearch function to the submit button
-            as.ss.click(function(event) {
+            as.submitButton.click(function(event) {
                 (event.preventDefault) ? event.preventDefault() : (event.returnValue = false);
-                if (as.hst && as.hstx) {
-                    delete(as.hstx);
+                if (as.useHistory && as.isHistoryEvent) {
+                    delete(as.isHistoryEvent);
                 }
                 doSearch(as);
                 return false;
             });
         } else {
             // with the livesearch mode, adds the doLiveSearch function. Launched after each typed character.
-            as.si.keyup(function() {
-                if (as.hst && as.hstx) {
-                    delete(as.hstx);
+            as.searchField.keyup(function() {
+                if (as.useHistory && as.isHistoryEvent) {
+                    delete(as.isHistoryEvent);
                 }
                 return doLiveSearch(as);
             });
         }
 
-        if (as.si.length) {
+        if (as.searchField.length) {
             // add the doSearch function to the input field. Launched after each typed character.
-            as.si.keydown(function(event) {
+            as.searchField.keydown(function(event) {
                 var keyCode = event.keyCode || event.which;
                 if (keyCode === 13) {
                     (event.preventDefault) ? event.preventDefault() : (event.returnValue = false);
-                    if (as.hst && as.hstx) {
-                        delete(as.hstx);
+                    if (as.useHistory && as.isHistoryEvent) {
+                        delete(as.isHistoryEvent);
                     }
                     return doSearch(as);
                 }
             });
         }
 
-        if ((as.ii !== 'all')) {
-            // no results displayed the first time
-            return false;
-        }
+        var isInitialSearch = true;
 
-        return doSearch(as); // display results
+        return doSearch(as, isInitialSearch); // display results
     }
 
     $.fn.serializeObject = function() {
@@ -333,14 +328,14 @@ jQuery(function($) {
         }
 
         $.each(json, function(index, item) {
-            if (!item[as['gmpLt']] || !item[as['gmpLn']]) {
+            if (!item[as['mapLat']] || !item[as['mapLong']]) {
                 return;
             }
             var options = {
-                position: new google.maps.LatLng(item[as['gmpLt']], item[as['gmpLn']]),
-                lat: item[as['gmpLt']],
-                long: item[as['gmpLn']],
-                title: item[as['gmpTtl']],
+                position: new google.maps.LatLng(item[as['mapLat']], item[as['mapLong']]),
+                lat: item[as['mapLat']],
+                long: item[as['mapLong']],
+                title: item[as['mapTitle']],
                 urlID: item['id']
             };
             gMapMarkers.push(options);
@@ -354,57 +349,48 @@ jQuery(function($) {
     }
 
     function doLiveSearch(as) {
-        if (as.lt) {
-            window.clearTimeout(as.lt);
+        if (as.liveSearchTimeout) {
+            window.clearTimeout(as.liveSearchTimeout);
         }
-        as.lt = window.setTimeout(function() {
+        as.liveSearchTimeout = window.setTimeout(function() {
             return doSearch(as);
         }, 400);
     }
 
-    function doSearch(as) {
-        var p = as.asid + '_';      // prefix for the instance
-        as.hst = as.hst - 0; // type casting
-        if (!as.ls && as.is) {
+    function doSearch(as, isInitialSearch = false) {
+        var prefix = as.asid + '_';      // prefix for the instance
+        as.useHistory = as.useHistory - 0; // type casting
+        if (!as.liveSearch && as.isSearching) {
             return false;  // search already launched
         }
 
         // search term analysis
-        var st = '';
-        if (as.si.length) {
+        var searchString = '';
+        if (as.searchField.length) {
             // simple search
-            st = as.si.val();
-        } else if (as.se.length) {  // multiple select input
+            searchString = as.searchField.val();
+        } else if (as.selectField.length) {  // multiple select input
             var sl = new Array();
-            as.se.find('option:selected').each(function(i) {
+            as.selectField.find('option:selected').each(function(i) {
                 sl.push($(this).attr('value'));
             }); // get the selected options
-            st = sl.join(" "); // concatenation of the selected options
+            searchString = sl.join(" "); // concatenation of the selected options
         }
-        if (st === as.cdt) {
-            st = ''; // box text is equivalent to an empty string
-        }
-        as.st = st;
+        as.searchString = searchString;
 
-        if ((as.ii !== 'all') ||
-                as.si.length && as.ls && (st.length < as.mc) // liveSearch needs minChars before to start
-                ) {
-            return false;
-        }
-
-        // ======================== we start the search
-        as.is = true;
-        if ((as.ii !== 'all') && !as.ls) {
-            as.ss.attr('disabled', 'disabled');  // submit button disabled
-        }
+        // if ((as.init !== 'all') ||
+        //         as.searchField.length && as.liveSearch && (st.length < as.minChars) // liveSearch needs minChars before to start
+        //         ) {
+        //     return false;
+        // }
 
         var pars = {
             asid: as.asid,
-            sub: as.sb
+            sub: as.submitButtonVal
         };
-        pars[as.sx] = as.st;
+        pars[as.searchParam] = as.searchString;
 
-        if (as.hst) {
+        if (as.useHistory) {
             var uri = new URI(document.location.href),
                     uriQuery = uri.query(true);
         }
@@ -412,24 +398,24 @@ jQuery(function($) {
         /**
          * Page number
          */
-        if (as.hst && (as.hstx || searchTracker.length === 0) && !as.nav) {
-            if (uriQuery[as.pax]) {
-                pars[as.pax] = uriQuery[as.pax];
+        if (as.useHistory && (as.isHistoryEvent || isInitialSearch) && !as.navLinkClicked) {
+            if (uriQuery[as.pageParam]) {
+                pars[as.pageParam] = uriQuery[as.pageParam];
             }
-        } else if (typeof (as.pag) === 'number' && as.pag > 0) {
-            pars[as.pax] = as.pag;
+        } else if (typeof (as.page) === 'number' && as.page > 0) {
+            pars[as.pageParam] = as.page;
         } else {
-            pars[as.pax] = 1;
+            pars[as.pageParam] = 1;
         }
 
-        if (typeof (pars[as.pax]) === 'undefined' || pars[as.pax] === 'undefined') {
-            pars[as.pax] = 1;
+        if (typeof (pars[as.pageParam]) === 'undefined' || pars[as.pageParam] === 'undefined') {
+            pars[as.pageParam] = 1;
         }
 
         // form content as serialized object
-        var formDom = $('#' + p + 'advsea-form');
+        var formDom = $('#' + prefix + 'advsea-form');
         // populate URL if history exists or direct URL
-        if (as.hst && (as.hstx || searchTracker.length === 0)) {
+        if (as.useHistory && (as.isHistoryEvent || isInitialSearch)) {
             var formData = {};
             $.each(uriQuery, function(idx, val) {
                 var checkbox = /(\[\])$/.test(idx);
@@ -440,21 +426,47 @@ jQuery(function($) {
                 formData[idx] = val;
             });
             formDom.populate(formData);
-            pars[as.sx] = uriQuery[as.sx];
+
+            if (isInitialSearch && !uriQuery[as.searchParam] && (as.init !== 'all')){
+                //Abort search if there is no search-string in the URL
+                return;
+            }
+
+            pars[as.searchParam] = uriQuery[as.searchParam];
+        }
+
+        if (isInitialSearch && (as.init == 'all')){
+            // Don't test the length of the search-string
+        } else {
+            // Test the length of the search-string
+            if (as.searchField.length && ((as.liveSearch && (pars[as.searchParam].length < as.minChars)) || (!as.liveSearch && pars[as.searchParam].length == 0))) { // liveSearch needs minChars before to start
+                return false;
+            }
         }
 
         var formVals = formDom.serializeObject();
-        as.fm = JSON.stringify(formVals);
+        as.formValsJson = JSON.stringify(formVals);
         // page
-        as.pag = (as.fm !== searchTracker[searchTracker.length - 1]) ? 1 : parseInt(as.pag);
+        as.page = (as.formValsJson !== searchTracker[searchTracker.length - 1]) ? 1 : parseInt(as.page);
 
-        pars['asform'] = as.fm;
+        if (searchTracker.length > 0 && (as.formValsJson !== searchTracker[searchTracker.length - 1])){
+            // Reset page number if form data has changed
+            pars[as.pageParam] = 1;
+        }
 
-        as.cl.hide(); // hide the close button
-        as.ld.show(); // show the load button
-        as.rw.css('opacity', as.opc / 2);
+        pars['asform'] = as.formValsJson;
 
-        return $.getJSON(as.arh, pars, function(data) {
+        // ======================== we start the search
+        as.isSearching = true;
+        if (!as.liveSearch) {
+            as.submitButton.attr('disabled', 'disabled');  // submit button disabled
+        }
+
+        as.closeImgEl.hide(); // hide the close button
+        as.loadImgEl.show(); // show the load button
+        as.resultEl.css('opacity', as.opacity / 2);
+
+        return $.getJSON(as.ajaxUrl, pars, function(data) {
             if (data) {
                 var ids = '';
                 if (data.ids) {
@@ -469,63 +481,63 @@ jQuery(function($) {
                     html = data.html;
                 }
 
-                as.ppg = parseInt(data.ppg);    // perPage
-                as.pag = parseInt(data.pag);    // page
-                as.pgt = parseInt(data.pgt);    // paging type
-                as.nbr = parseInt(data.nbr);    // nb results
-                as.opc = parseFloat(data.opc);  // opacity
-                as.eff = data.eff;              // effect
+                as.perpage = parseInt(data.perpage);    // amount of results per page
+                as.page = parseInt(data.page);    // current page
+                as.pagingtype = parseInt(data.pagingtype);    // paging type
+                as.total = parseInt(data.total);    // total amount of results
 
-                as.rw.hide();
-                as.rw.html(html).css('opacity', as.opc).reswinDown(as.eff);
-                if (as.gmp && json) {
-                    var mapCanvas = $('#' + as.gmp);
+                as.resultEl.hide();
+                as.resultEl.html(html).css('opacity', as.opacity).reswinDown(as.effect);
+                if (as.mapId && json) {
+                    var mapCanvas = $('#' + as.mapId);
                     if (mapCanvas.length > 0) {
                         var map = mapCanvas.advSearchGMap(as, {
-                            "zoom": (as.gmpZoom - 0),
-                            "centerLat": as.gmpCenterLat,
-                            "centerLong": as.gmpCenterLong
+                            "zoom": (as.mapZoom - 0),
+                            "centerLat": as.mapCenterLat,
+                            "centerLong": as.mapCenterLong
                         });
                         setGMapMarkers(as, JSON.parse(json));
                         map.initialize();
                     }
                 }
-                if (as.pgt === 1) {
+                if (as.pagingtype === 1) {
                     initPageType1(as);
-                } else if (as.pgt === 2) {
+                } else if (as.pagingtype === 2) {
                     initPageType2(as);
-                } else if (as.pgt === 3) {
+                } else if (as.pagingtype === 3) {
                     initPageType3(as);
                 }
             }
-            if (!as.ls) {
-                as.ss.removeAttr('disabled'); // submit button enabled
+            if (!as.liveSearch) {
+                as.submitButton.removeAttr('disabled'); // submit button enabled
             }
-            as.ld.hide();   // hide the load button
-            as.cl.show();   // show the close button
-            as.is = false;  // new search allowed
-            if (as.hst) {
-                if (!as.hstx) {
+            as.loadImgEl.hide();   // hide the load button
+            as.closeImgEl.show();   // show the close button
+            as.isSearching = false;  // new search allowed
+            if (as.useHistory) {
+                if (!as.isHistoryEvent) {
                     setHistory(as, pars);
                 }
             }
 
-            searchTracker.push(JSON.stringify(formDom.serializeObject()));
+            searchTracker.push(as.formValsJson);
         });
     }
 
     function closeSearch(as) {
-        as.rw.reswinUp(as.eff);
-        as.cl.hide();
-        as.ld.hide();
-        if (as.si.length) {
-            $('#' + as.px + 'advsea-form')[0].reset();
-            as.si.prop('placeholder', as.cdt);
-            History.pushState({}, document.title, document.location.origin + document.location.pathname);
+        as.resultEl.reswinUp(as.effect);
+        as.closeImgEl.hide();
+        as.loadImgEl.hide();
+        if (as.searchField.length) {
+            $('#' + as.prefix + 'advsea-form')[0].reset();
+            as.page = 1;
+            if (as.useHistory) {
+                History.pushState({}, document.title, document.location.origin + document.location.pathname);
+            }
         }
-        as.is = false;
-        if (!as.ls) {
-            as.ss.removeAttr('disabled'); // enabled the submit button
+        as.isSearching = false;
+        if (!as.liveSearch) {
+            as.submitButton.removeAttr('disabled'); // enabled the submit button
         }
     }
 
@@ -533,7 +545,7 @@ jQuery(function($) {
 
     function initPageType1(as) {  // add previous & next links after the display of results
         if (as) {
-            var next = as.rw.find('.advsea-next a');
+            var next = as.resultEl.find('.advsea-next a');
             next.prop("href", "javascript:void(0);"); // remove href
             next.attr("href", "javascript:void(0);"); // remove href, blame IE
             next.click(function(event) {
@@ -541,7 +553,7 @@ jQuery(function($) {
                 prevNext(as, 1);
                 return false;
             });
-            var prev = as.rw.find('.advsea-previous a');
+            var prev = as.resultEl.find('.advsea-previous a');
             prev.prop("href", "javascript:void(0);"); // remove href
             prev.attr("href", "javascript:void(0);"); // remove href, blame IE
             prev.click(function(event) {
@@ -557,7 +569,7 @@ jQuery(function($) {
 
     function initPageType2(as) {  // add link to each page number
         if (as) {
-            var links = as.rw.find('.advsea-page a').not('.advsea-current-page a');
+            var links = as.resultEl.find('.advsea-page a').not('.advsea-current-page a');
             links.each(function() {
                 var href = $(this).data("href");
                 if (typeof(href) === 'undefined' || href === '') {
@@ -581,7 +593,7 @@ jQuery(function($) {
 
     function initPageType3(as) {
         if (as) {
-            var links = as.rw.find('.advsea-page a').not('.advsea-current-page a');
+            var links = as.resultEl.find('.advsea-page a').not('.advsea-current-page a');
             links.each(function() {
                 var href = $(this).data("href");
                 if (typeof(href) === 'undefined' || href === '') {
@@ -597,7 +609,7 @@ jQuery(function($) {
                     return false;
                 });
             });
-            var next = as.rw.find('.advsea-next a');
+            var next = as.resultEl.find('.advsea-next a');
             next.prop("href", "javascript:void(0);"); // remove href
             next.attr("href", "javascript:void(0);"); // remove href, blame IE
             next.click(function(event) {
@@ -605,7 +617,7 @@ jQuery(function($) {
                 prevNext(as, 1);
                 return false;
             });
-            var prev = as.rw.find('.advsea-previous a');
+            var prev = as.resultEl.find('.advsea-previous a');
             prev.prop("href", "javascript:void(0);"); // remove href
             prev.attr("href", "javascript:void(0);"); // remove href, blame IE
             prev.click(function(event) {
@@ -619,19 +631,19 @@ jQuery(function($) {
 //======================================== links generators ==========================
 
     function prevNext(as, dir) { // update of the page of results
-        as.pag = as.pag - 0 + dir; // typecasting
-        as.nav = 1;
-        if (as.hst && as.hstx) {
-            delete(as.hstx);
+        as.page = as.page - 0 + dir; // typecasting
+        as.navLinkClicked = true;
+        if (as.useHistory && as.isHistoryEvent) {
+            delete(as.isHistoryEvent);
         }
         return doSearch(as);
     }
 
-    function pageLink(as, pag) { // add page link
-        as.pag = pag - 0; // typecasting
-        as.nav = 1;
-        if (as.hst && as.hstx) {
-            delete(as.hstx);
+    function pageLink(as, page) { // add page link
+        as.page = page - 0; // typecasting
+        as.navLinkClicked = true;
+        if (as.useHistory && as.isHistoryEvent) {
+            delete(as.isHistoryEvent);
         }
         return doSearch(as);
     }
@@ -641,7 +653,7 @@ jQuery(function($) {
     var History = window.History;
 
     function setHistory(as, pars) {
-        if (!History || !History.enabled || as.ii !== 'all' || as.hstx) {
+        if (!History || !History.enabled || as.isHistoryEvent) {
             return;
         }
         var href = buildUrl(as, pars);
@@ -654,16 +666,27 @@ jQuery(function($) {
 
     function buildUrl(as, pars) {
         var asformArr = new Array();
-        var parseForm = JSON.parse(as.fm);
+        var parseForm = JSON.parse(as.formValsJson);
         var uri = new URI(document.location.href),
                 uriQuery = uri.query(true);
-        //var newUri = $.extend({}, uriQuery, parseForm, {sub: as.sb});
-        var newUri = $.extend({}, parseForm, {sub: as.sb});
-        if (typeof (newUri[as.pax]) !== 'undefined' || newUri[as.pax] !== 'undefined' && (newUri[as.pax] - 0) === as.pag) {
-            newUri[as.pax] = pars[as.pax];
+        //var newUri = $.extend({}, uriQuery, parseForm, {sub: as.submitButtonVal});
+        var newUri = $.extend({}, parseForm, {sub: as.submitButtonVal});
+
+        // add page parameter
+        if (typeof (newUri[as.pageParam]) == 'undefined'){
+            if (pars[as.pageParam]) {
+                newUri[as.pageParam] = pars[as.pageParam];
+            } else {
+                newUri[as.pageParam] = 1;
+            }
         } else {
-            newUri[as.pax] = 1;
+            if (typeof (newUri[as.pageParam]) !== 'undefined' || newUri[as.pageParam] !== 'undefined' && (newUri[as.pageParam] - 0) === as.page) {
+                newUri[as.pageParam] = pars[as.pageParam];
+            } else {
+                newUri[as.pageParam] = 1;
+            }
         }
+
         $.each(newUri, function(index, item) {
             $.merge(asformArr, [index + '=' + item]);
         });
@@ -678,7 +701,7 @@ jQuery(function($) {
     if (History && History.enabled) {
         History.Adapter.bind(window, 'statechange', function() {
             if (!blockHistoryEvent) {
-                activateSearch({hstx: 1});
+                activateSearch({isHistoryEvent: 1});
             }
             // resetting value
             blockHistoryEvent = false;

@@ -18,7 +18,7 @@ use AdvSearch\AdvSearch;
 
 class AdvSearchForm extends AdvSearch {
 
-    public function __construct(modX & $modx, array $config = array()) {
+    public function __construct(modX &$modx, array $config = array()) {
         // ajax mode parameters
         if ($config['withAjax']) {
             // &ajaxResultsId - [ resource id | 0]
@@ -83,15 +83,9 @@ class AdvSearchForm extends AdvSearch {
             'asId' => $this->config['asId'],
             'searchValue' => htmlspecialchars($this->searchString),
             'searchParam' => $this->config['searchParam'],
-            'liveSearch' => $this->config['liveSearch'],
+            'liveSearch' => $this->config['liveSearch'] ? 1 : 0,
             'resultsWindow' => $resultsWindow
         );
-
-        if ($this->config['liveSearch']) {
-            $placeholders['liveSearch'] = 1;
-        } else {
-            $placeholders['liveSearch'] = 0;
-        }
 
         // &tpl [ chunk name | 'AdvSearchForm' ]
         $this->config['tpl'] = $this->modx->getOption('tpl', $this->config, 'AdvSearchForm');
@@ -129,11 +123,8 @@ class AdvSearchForm extends AdvSearch {
             }
 
             // &jsSearch - [ url | $assetsUrl . 'js/advsearch.min.js' ]
-            $this->config['jsSearch'] = $this->modx->getOption('jsSearch', $this->config, $this->config['assetsUrl'] . 'js/advsearch.min.js');
+            $this->config['jsSearch'] = $this->modx->getOption('jsSearch', $this->config, $this->config['assetsUrl'] . 'js/advsearch.js');
             $this->config['jsSearch'] = $this->replacePropPhs($this->config['jsSearch']);
-
-            // &jsPopulateForm - [ js populate form library ]
-            $this->config['jsPopulateForm'] = $this->modx->getOption('jsPopulateForm', $this->config, $this->config['assetsUrl'] . 'vendors/populate/jquery.populate.pack.js');
 
             // &useHistory - [ 0 | 1 ]
             $this->config['useHistory'] = $this->modx->getOption('useHistory', $this->config, 0);
@@ -141,8 +132,15 @@ class AdvSearchForm extends AdvSearch {
             if ($this->config['useHistory']) {
                 // &jsURI - [ URI.js library ]
                 $this->config['jsURI'] = $this->modx->getOption('jsURI', $this->config, $this->config['assetsUrl'] . 'vendors/urijs/src/URI.min.js');
+                $this->config['jsURI'] = $this->replacePropPhs($this->config['jsURI']);
+
                 // &jsHistory - [ History.js library ]
                 $this->config['jsHistory'] = $this->modx->getOption('jsHistory', $this->config, $this->config['assetsUrl'] . 'vendors/historyjs/scripts/bundled-uncompressed/html5/jquery.history.js');
+                $this->config['jsHistory'] = $this->replacePropPhs($this->config['jsHistory']);
+
+                // &jsPopulateForm - [ js populate form library ]
+                $this->config['jsPopulateForm'] = $this->modx->getOption('jsPopulateForm', $this->config, $this->config['assetsUrl'] . 'vendors/populate/jquery.populate.pack.js');
+                $this->config['jsPopulateForm'] = $this->replacePropPhs($this->config['jsPopulateForm']);
             }
 
             // include the advsearch js file in the header
@@ -161,49 +159,52 @@ class AdvSearchForm extends AdvSearch {
                 }
             }
 
-            // if ($this->config['clearDefault']) {
-                $jsHeaderArray['cdt'] = $this->modx->lexicon('advsearch.box_text');
-            // }
-
             // add ajaxResultsId, liveSearch mode and some other parameters in js header
             $jsHeaderArray['asid'] = $this->config['asId'];
+
             if ($this->config['liveSearch']) {
-                $jsHeaderArray['ls'] = $this->config['liveSearch'];
-            }
-            if ($this->config['searchParam'] != 'search') {
-                $jsHeaderArray['sx'] = $this->config['searchParam'];
-            }
-            if ($this->config['pageParam'] != 'page') {
-                $jsHeaderArray['pax'] = $this->config['pageParam'];
-            }
-            if ($this->config['init'] != 'none') {
-                $jsHeaderArray['ii'] = $this->config['init'];
+                $jsHeaderArray['liveSearch'] = $this->config['liveSearch'];
+                $jsHeaderArray['minChars'] = $this->config['minChars'];
             }
 
-            $jsHeaderArray['hst'] = $this->config['useHistory'];
+            if ($this->config['searchParam'] != 'search') {
+                $jsHeaderArray['searchParam'] = $this->config['searchParam'];
+            }
+
+            if ($this->config['pageParam'] != 'page') {
+                $jsHeaderArray['pageParam'] = $this->config['pageParam'];
+            }
+
+            if ($this->config['init'] != 'none') {
+                $jsHeaderArray['init'] = $this->config['init'];
+            }
+
+            $jsHeaderArray['useHistory'] = $this->config['useHistory'];
 
             // ajax connector
-            $jsHeaderArray['arh'] = $this->modx->makeUrl($this->config['ajaxResultsId'], '', array(), $this->config['urlScheme']);
+            $jsHeaderArray['ajaxUrl'] = $this->modx->makeUrl($this->config['ajaxResultsId'], '', array(), $this->config['urlScheme']);
 
             // &ajaxLoaderImageTpl - [ the chunk of spinning loader image. @FILE/@CODE/@INLINE[/@CHUNK] ]
             $ajaxLoaderImageTpl = $this->modx->getOption('ajaxLoaderImageTpl', $this->config, '@CODE <img src="' . $this->config['assetsUrl'] . 'js/images/indicator.white.gif' . '" alt="loading" />');
+            $ajaxLoaderImageTpl = $this->replacePropPhs($ajaxLoaderImageTpl);
 
             // &ajaxCloseImageTpl - [ the chunk of close image. @FILE/@CODE/@INLINE[/@CHUNK] ]
             $ajaxCloseImageTpl = $this->modx->getOption('ajaxCloseImageTpl', $this->config, '@CODE <img src="' . $this->config['assetsUrl'] . 'js/images/close2.png' . '" alt="close search" />');
+            $ajaxCloseImageTpl = $this->replacePropPhs($ajaxCloseImageTpl);
 
             // loader image
             $ajaxLoaderImage = $this->processElementTags($this->parseTpl($ajaxLoaderImageTpl));
             if (!empty($ajaxLoaderImage)) {
-                $jsHeaderArray['ali'] = addslashes(trim($ajaxLoaderImage));
+                $jsHeaderArray['loadImg'] = addslashes(trim($ajaxLoaderImage));
                 // DOM ID that holds the loader image
-                $jsHeaderArray['alii'] = $this->modx->getOption('ajaxLoaderImageDOMId', $this->config);
+                $jsHeaderArray['loadImgId'] = $this->modx->getOption('ajaxLoaderImageDOMId', $this->config);
             }
             // close image
             $ajaxCloseImage = $this->processElementTags($this->parseTpl($ajaxCloseImageTpl));
             if (!empty($ajaxCloseImage)) {
-                $jsHeaderArray['aci'] = addslashes(trim($ajaxCloseImage));
-                // DOM ID that holds the loader image
-                $jsHeaderArray['acii'] = $this->modx->getOption('ajaxCloseImageDOMId', $this->config);
+                $jsHeaderArray['closeImg'] = addslashes(trim($ajaxCloseImage));
+                // DOM ID that holds the close image
+                $jsHeaderArray['closeImgId'] = $this->modx->getOption('ajaxCloseImageDOMId', $this->config);
             }
 
             // &opacity - [ 0. < float <= 1. ]  Should be a float value
@@ -212,23 +213,24 @@ class AdvSearchForm extends AdvSearch {
             $jsHeaderArray['opacity'] = $this->config['opacity'];
 
             // &effect - [ 'basic' | 'showfade' | 'slidefade' ]
-            $this->config['effect'] = $this->modx->getOption('effect', $this->config, 'basic');
+            $effect = strtolower($this->modx->getOption('effect', $this->config, 'basic'));
+            $this->config['effect'] = in_array($effect, ['basic', 'showfade', 'slidefade']) ? $effect : 'basic';
             $jsHeaderArray['effect'] = $this->config['effect'];
 
             /**
              * Google Map
              */
-            $jsHeaderArray['gmp'] = $this->modx->getOption('googleMapDomId', $this->config);
-            $jsHeaderArray['gmpLt'] = $this->modx->getOption('googleMapLatTv', $this->config);
-            $jsHeaderArray['gmpLn'] = $this->modx->getOption('googleMapLonTv', $this->config);
-            $jsHeaderArray['gmpTtl'] = $this->modx->getOption('googleMapMarkerTitleField', $this->config);
+            $jsHeaderArray['mapId'] = $this->modx->getOption('googleMapDomId', $this->config);
+            $jsHeaderArray['mapLat'] = $this->modx->getOption('googleMapLatTv', $this->config);
+            $jsHeaderArray['mapLong'] = $this->modx->getOption('googleMapLonTv', $this->config);
+            $jsHeaderArray['mapTitle'] = $this->modx->getOption('googleMapMarkerTitleField', $this->config);
             $googleMapMarkerWindowId  = intval($this->modx->getOption('googleMapMarkerWindowId', $this->config));
             if (!empty($googleMapMarkerWindowId)) {
-                $jsHeaderArray['gmpWin'] = $this->modx->makeUrl($googleMapMarkerWindowId, '', '', $this->config['urlScheme']);
+                $jsHeaderArray['mapUrl'] = $this->modx->makeUrl($googleMapMarkerWindowId, '', '', $this->config['urlScheme']);
             }
-            $jsHeaderArray['gmpZoom'] = (int) $this->modx->getOption('googleMapZoom', $this->config, 5);
-            $jsHeaderArray['gmpCenterLat'] = $this->modx->getOption('googleMapCenterLat', $this->config);
-            $jsHeaderArray['gmpCenterLong'] = $this->modx->getOption('googleMapCenterLong', $this->config);
+            $jsHeaderArray['mapZoom'] = (int) $this->modx->getOption('googleMapZoom', $this->config, 5);
+            $jsHeaderArray['mapCenterLat'] = $this->modx->getOption('googleMapCenterLat', $this->config);
+            $jsHeaderArray['mapCenterLong'] = $this->modx->getOption('googleMapCenterLong', $this->config);
 
             // &keyval
             $this->config['keyval'] = $this->modx->getOption('keyval', $this->config, '');
@@ -243,7 +245,6 @@ class AdvSearchForm extends AdvSearch {
         }
 
         // set up of js header for the current instance
-        $jsHeaderArray = array_unique($jsHeaderArray);
         $jshCount = count($jsHeaderArray);
         if ($jshCount) {
             $json = json_encode($jsHeaderArray);

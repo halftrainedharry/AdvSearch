@@ -56,16 +56,26 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
-| withAjax | whether to set on a new document (page reload), or set the results in div section thru ajax. | 0 => non-ajax mode |
+| withAjax | Whether to get the search results with an AJAX request or by reloading the page. | 0 => non-ajax mode |
 | ajaxResultsId | The resource id which holds the AdvSearch snippet call. This document is called through AJAX. It should be a plain/text document with empty template. This property is mandatory with the ajax mode. | 0 |
-| addJs | Whether to add the javascript files to the web pages automatically. 0 => not included. You should add them manually; 1 => Included before the closing HEAD tag; 2 => Included before the closing BODY tag. | 1 |
+| resultsWindowTpl | Chunk for the markup where the search results are displayed. Available placeholder in the chunk: `[[+asId]]`. | AdvSearchResultsWindow |
 | addJQuery | Whether to add the jQuery library to the page automatically. 0 => Not included; 1 => Included before the closing HEAD tag; 2 => Included before the closing BODY tag | 1 |
 | jsJQuery | Location of the jQuery javascript library. Change this parameter to use a newer jQuery version. The placeholder `{assets_url}` can be used. | assets/components/advsearch/js/jquery-1.10.2.min.js |
+| addJs | Whether to add the javascript files to the web pages automatically. 0 => not included. You should add them manually; 1 => Included before the closing HEAD tag; 2 => Included before the closing BODY tag. | 1 |
 | jsSearch | Location of the a javascript file, that does the AJAX calls and handles the response. The placeholder `{assets_url}` can be used. | assets/components/advsearch/js/advsearch.min.js |
-| resultsWindowTpl | Chunk for the markup where the search results are displayed. Available placeholder in the chunk: `[[+asId]]`. | AdvSearchResultsWindow |
+| useHistory | Change the browser history when after an AJAX search. | 0 |
+| jsHistory | Location of the History.js javascript library. | assets/components/advsearch/vendors/historyjs/scripts/bundled-uncompressed/html5/jquery.history.js |
+| jsURI | Location of the URI.js javascript library. | assets/components/advsearch/vendors/urijs/src/URI.min.js |
+| jsPopulateForm | Location of the populate jQuery plugin. | assets/components/advsearch/vendors/populate/jquery.populate.pack.js |
 | liveSearch | to use the live search (i.e. results as typing) | 0 |
+| minChars | Minimum number of characters before the search is started when "liveSearch" is used. 2 <= int <= 10 | 3 |
+| ajaxLoaderImageTpl | The chunk for the spinning loader image. | `@CODE <img src="{assets_url}js/images/indicator.white.gif" alt="loading" />` |
+| ajaxLoaderImageDOMId | The ID of a DOM element where the "ajaxLoaderImageTpl" content is added. | |
+| ajaxCloseImageTpl | The chunk for the close image. | `@CODE <img src="{assets_url}js/images/close2.png" alt="close search" />` |
+| ajaxCloseImageDOMId | The ID of a DOM element where the "ajaxCloseImageTpl" content is added. | |
+| keyval | Custom key value pairs that are added to the configuration (that is stored in the JS variable "advsea"). Format: ``&keyval=`key1:val1,key2:val2` ``| |
 | effect | The effect to apply for the displaying of the window of results. Options: basic, showfade, slidefade | basic |
-| opacity | Opacity of the advSearch_output div where are returned the ajax results. Options: 0. (transparent) < Float < 1. (opaque) | 1 |
+| opacity | Opacity of the advSearch_output div where are returned the ajax results. Options: 0. (transparent) < Float <= 1. (opaque) | 1 |
 
 ### Google Maps Properties
 
@@ -162,9 +172,9 @@ Basic usage:
 
 | Name | Description | Default |
 | :--- | :--- | :--- |
+| withAjax | Whether to get the search results with an AJAX request or by reloading the page. | 0 => non-ajax mode |
 | moreResults | The resource id of the page you want the more results link to point to. Mandatory if you want more results. | 0 => no moreResults page |
 | moreResultsTpl | The chunk name to use for the "More results" link. | AdvSearchMoreResults |
-| withAjax | whether to set on a new document (page reload), or set the results in div section thru ajax. Should be set to 1 with ajax mode. | 0 => non-ajax mode |
 
 ## AdvSearchGmapInfoWindow
 

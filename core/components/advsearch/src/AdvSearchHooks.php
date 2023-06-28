@@ -52,8 +52,8 @@ class AdvSearchHooks {
      * @return asHooks
      */
     public function __construct(AdvSearch &$search, array $config = array()) {
-        $this->search = & $search;
-        $this->modx = & $search->modx;
+        $this->search = &$search;
+        $this->modx = &$search->modx;
         $this->config = array_merge(array(
                 ), $config);
     }
@@ -113,9 +113,9 @@ class AdvSearchHooks {
         } else if ($snippet = $this->modx->getObject('modSnippet', array('name' => $hook))) {
             /* custom snippet hook */
             $properties = array_merge($this->search->config, $customProperties);
-            $properties['advsearch'] = & $this->search;
-            $properties['hook'] = & $this;
-            $properties['errors'] = & $this->errors;
+            $properties['advsearch'] = &$this->search;
+            $properties['hook'] = &$this;
+            $properties['errors'] = &$this->errors;
             $success = $snippet->process($properties);
         } else {
             /* no hook found */

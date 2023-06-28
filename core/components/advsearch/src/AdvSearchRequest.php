@@ -28,7 +28,7 @@ class AdvSearchRequest extends AdvSearch {
     protected $nbExtracts;
     protected $asr = null;
 
-    public function __construct(modX & $modx, array $config = array()) {
+    public function __construct(modX &$modx, array $config = array()) {
         parent::__construct($modx, $config);
     }
 
@@ -66,10 +66,6 @@ class AdvSearchRequest extends AdvSearch {
         // &maxWords [ 1 < int < 30 ]
         $maxWords = (int) $this->modx->getOption('maxWords', $this->config, 20);
         $this->config['maxWords'] = (($maxWords <= 30) && ($maxWords >= 1)) ? $maxWords : 20;
-
-        // &minChars [  2 <= int <= 10 ]
-        $minChars = (int) $this->modx->getOption('minChars', $this->config, 3);
-        $this->config['minChars'] = (($minChars <= 10) && ($minChars >= 2)) ? $minChars : 3;
 
         // &queryHook [ snippet name | '' ]
         $this->config['queryHook'] = trim($this->modx->getOption('queryHook', $this->config, ''));
@@ -151,12 +147,10 @@ class AdvSearchRequest extends AdvSearch {
             }
 
             if ($this->config['withAjax']) {
-                $out['pag'] = $this->page;
-                $out['ppg'] = $this->config['perPage'];
-                $out['nbr'] = $outputCount;
-                $out['pgt'] = $this->config['pagingType'];
-                // $out['opc'] = $this->config['opacity'];
-                // $out['eff'] = $this->config['effect'];
+                $out['page'] = $this->page;
+                $out['perpage'] = $this->config['perPage'];
+                $out['total'] = $outputCount;
+                $out['pagingtype'] = $this->config['pagingType'];
 
                 $output = json_encode($out);
             } else {

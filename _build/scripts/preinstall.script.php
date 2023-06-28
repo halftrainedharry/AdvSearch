@@ -38,7 +38,7 @@
 /* The $modx object is not available here. In its place we
  * use $object->xpdo
  */
-$modx = & $object->xpdo;
+$modx = &$object->xpdo;
 
 $modx->log(xPDO::LOG_LEVEL_INFO, 'Running PHP Validator.');
 switch ($options[xPDOTransport::PACKAGE_ACTION]) {

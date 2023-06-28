@@ -37,15 +37,15 @@ class AdvSearchResults extends AdvSearch {
     protected $tvWhereFields = array();
     protected $driver;
 
-    public function __construct(modX & $modx, array & $config = array()) {
+    public function __construct(modX &$modx, array &$config = array()) {
         //parent::__construct($modx, $config);
         // get time of starting
         $mtime = explode(" ", microtime());
         $this->tstart = $mtime[1] + $mtime[0];
-        
-        $this->modx = & $modx;
+
+        $this->modx = &$modx;
         $this->debug = ($config['debug'] > 0);
-        $this->config = $config;
+        $this->config = &$config;
     }
 
     /**

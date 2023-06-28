@@ -45,13 +45,13 @@ class AdvSearch {
      */
     private $_chunks = array();
 
-    public function __construct(modX & $modx, array & $config = array()) {
+    public function __construct(modX &$modx, array &$config = array()) {
 
         // get time of starting
         $mtime = explode(" ", microtime());
         $this->tstart = $mtime[1] + $mtime[0];
 
-        $this->modx = & $modx;
+        $this->modx = &$modx;
 
         // &debug = [ 0 | 1 ]
         $config['debug'] = $this->modx->getOption('debug', $config, 0);
@@ -142,7 +142,7 @@ class AdvSearch {
         if (!count($output)) {
             $output = ['html'];
         }
-        $this->config['output'] = $output;       
+        $this->config['output'] = $output;
 
         // &searchParam [ string | 'search' ]
         $this->config['searchParam'] = trim($this->modx->getOption('searchParam', $this->config, 'search'));
@@ -172,6 +172,10 @@ class AdvSearch {
 
         // &hideLinks
         $this->config['hideLinks'] = $this->modx->getOption('hideLinks', $this->config, 0);
+
+        // &minChars [  2 <= int <= 10 ]
+        $minChars = (int) $this->modx->getOption('minChars', $this->config, 3);
+        $this->config['minChars'] = (($minChars <= 10) && ($minChars >= 2)) ? $minChars : 3;
 
         return $this->config;
 
@@ -670,7 +674,7 @@ class AdvSearch {
      * @param integer $nbTerms Number of terms already processed
      * @return boolean Returns true if valid, otherwise false.
      */
-    public function validTerm($term, $type, $sign, & $nbTerms = 0, $record = true) {
+    public function validTerm($term, $type, $sign, &$nbTerms = 0, $record = true) {
         if ($type == 'phrase') {
             $phrase = substr($term, 1, -1); // remove beginning and end quotes
             $phraseArray = explode(' ', $phrase);
